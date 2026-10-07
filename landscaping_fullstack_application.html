@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspen Leaf Scape Ltd | Landscaping & Groundskeeping</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            deep: '#1E3A2B',    // Earthy Forest Green
+                            light: '#F9F8F3',   // Warm Sand background
+                            accent: '#D97706',  // Amber / Terracotta
+                            sage: '#4A6B5D',    // Muted Sage
+                            dark: '#111827'     // Slate Charcoal
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F9F8F3; color: #1F2937; }
+        
+        /* Interactive Before/After Image Slider Styles */
+        .ba-container { position: relative; overflow: hidden; user-select: none; }
+        .ba-overlay { position: absolute; top: 0; left: 0; height: 100%; width: 50%; overflow: hidden; border-right: 3px solid #FFFFFF; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
+        .ba-slider-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; background: #D97706; border: 3px solid #FFF; color: white; display: flex; align-items: center; justify-content: center; cursor: ew-resize; z-index: 10; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        
+        /* Glassmorphism & Custom Scrollbar */
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #F9F8F3; }
+        ::-webkit-scrollbar-thumb { background: #4A6B5D; border-radius: 4px; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- 1. LIVE WEATHER NOTIFICATION BANNER (LUXURY) -->
+    <div id="weather-banner" class="bg-brand-deep text-white px-4 py-2 text-xs md:text-sm font-medium flex items-center justify-between border-b border-brand-sage/30">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-cloud-sun-rain text-amber-400 text-base"></i>
+                <span id="weather-info">Fetching live local weather advice...</span>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <span class="hidden sm:inline text-emerald-200"><i class="fa-solid fa-shield-halved mr-1"></i> 100% Guaranteed Quality</span>
+                <a href="admin.html" class="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition">
+                    <i class="fa-solid fa-lock mr-1"></i> Admin Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur shadow-sm border-b border-gray-100">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-lg bg-brand-deep flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-leaf text-amber-400"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-brand-deep">ASPEN LEAF SCAPE LTD</span>
+            </a>
+
+            <nav class="hidden lg:flex items-center space-x-8 font-medium text-sm text-gray-700">
+                <a href="#services" class="hover:text-brand-accent transition">Services</a>
+                <a href="#estimator" class="hover:text-brand-accent transition">Instant Estimator</a>
+                <a href="#gallery" class="hover:text-brand-accent transition">Transformations</a>
+                <a href="#reviews" class="hover:text-brand-accent transition">Reviews</a>
+                <a href="#visualizer" class="hover:text-brand-accent transition">2D Yard Planner</a>
+                <a href="#portal" class="hover:text-brand-accent transition">Client Portal</a>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <a href="tel:+254743313867" class="hidden sm:flex items-center space-x-2 text-brand-deep font-bold text-sm bg-brand-light px-3 py-2 rounded-lg hover:bg-emerald-100 transition border border-emerald-200">
+                    <i class="fa-solid fa-phone text-brand-accent"></i>
+                    <span>0743 313867</span>
+                </a>
+                <a href="#quote" class="bg-brand-accent hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-md transition transform active:scale-95">
+                    Request Quote
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative bg-brand-deep text-white py-20 lg:py-28 overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-cover bg-center" id="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80');"></div>
+        <div class="container mx-auto px-4 relative z-10 grid lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-7 space-y-6">
+                <span class="inline-block bg-amber-500/20 text-amber-300 font-semibold text-xs tracking-wider uppercase px-3 py-1 rounded-full border border-amber-400/30">
+                    Premium Groundskeeping & Outdoor Living
+                </span>
+                <h1 id="dyn-hero-headline" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+                    Transforming Lawns into Living Masterpieces
+                </h1>
+                <p id="dyn-hero-subtitle" class="text-lg text-gray-200 max-w-2xl font-light">
+                    Full-service landscaping, automated care schedules, custom hardscaping, and precision maintenance for residential & commercial properties.
+                </p>
+                <div class="flex flex-wrap gap-4 pt-2">
+                    <a href="#estimator" class="bg-brand-accent hover:bg-amber-600 text-white font-bold px-6 py-3.5 rounded-lg shadow-lg transition flex items-center space-x-2">
+                        <span>Calculate Cost Estimate</span>
+                        <i class="fa-solid fa-calculator"></i>
+                    </a>
+                    <a href="#visualizer" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3.5 rounded-lg border border-white/20 transition flex items-center space-x-2">
+                        <span>Try 2D Yard Planner</span>
+                        <i class="fa-solid fa-compass-drafting"></i>
+                    </a>
+                </div>
+                <!-- Trust Stats -->
+                <div class="grid grid-cols-3 gap-4 pt-8 border-t border-white/10 text-center">
+                    <div>
+                        <p class="text-2xl font-bold text-amber-400">1,200+</p>
+                        <p class="text-xs text-gray-300">Lawns Managed</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-amber-400">4.9 ★</p>
+                        <p class="text-xs text-gray-300">Google Rating</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-amber-400">15+ Yrs</p>
+                        <p class="text-xs text-gray-300">Experience</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fast Service Area Checker Widget -->
+            <div class="lg:col-span-5">
+                <div class="bg-white text-gray-800 rounded-2xl p-6 shadow-2xl space-y-4 border border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-emerald-100 text-brand-deep rounded-lg">
+                            <i class="fa-solid fa-map-location-dot text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-brand-deep">Check Service Availability</h3>
+                            <p class="text-xs text-gray-500">Enter your ZIP code for instant service check</p>
+                        </div>
+                    </div>
+                    <form onsubmit="checkZipCode(event)" class="flex space-x-2">
+                        <input type="text" id="zip-input" placeholder="e.g. 90210" maxlength="5" pattern="\d{5}" required class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-sage">
+                        <button type="submit" class="bg-brand-deep hover:bg-emerald-900 text-white px-5 py-3 rounded-lg font-semibold text-sm transition">
+                            Check
+                        </button>
+                    </form>
+                    <div id="zip-result" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. SERVICES SHOWCASE SECTION -->
+    <section id="services" class="py-20 container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <span class="text-brand-accent font-bold uppercase tracking-wider text-xs">Our Expert Services</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-deep">Comprehensive Landscape Care</h2>
+            <p class="text-gray-600">Tailored maintenance packages and custom hardscape engineering designed for longevity.</p>
+        </div>
+
+        <div id="services-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </section>
+
+    <!-- 3. AUTOMATED INSTANT ESTIMATOR TOOL -->
+    <section id="estimator" class="py-16 bg-white border-y border-gray-200">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="text-center space-y-2 mb-10">
+                <span class="text-brand-accent font-bold uppercase tracking-wider text-xs">Transparent Pricing</span>
+                <h2 class="text-3xl font-extrabold text-brand-deep">Instant Lawn Care Calculator</h2>
+                <p class="text-sm text-gray-600">Adjust lawn size and services to calculate an estimated monthly maintenance cost.</p>
+            </div>
+
+            <div class="bg-brand-light p-6 sm:p-10 rounded-2xl shadow-inner border border-gray-200 grid md:grid-cols-12 gap-8 items-center">
+                <div class="md:col-span-7 space-y-6">
+                    <!-- Range Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="font-bold text-gray-700 text-sm">Estimated Lawn Size (Sq. Ft.):</label>
+                            <span id="lawn-size-val" class="font-bold text-brand-deep text-lg">5,000 sq ft</span>
+                        </div>
+                        <input type="range" id="lawn-size" min="1000" max="25000" step="500" value="5000" oninput="calculateEstimate()" class="w-full accent-brand-accent cursor-pointer">
+                    </div>
+
+                    <!-- Service Checkboxes -->
+                    <div class="space-y-3">
+                        <label class="font-bold text-gray-700 text-sm block">Select Desired Services:</label>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <label class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200 cursor-pointer">
+                                <input type="checkbox" id="chk-mow" checked onchange="calculateEstimate()" class="accent-brand-deep">
+                                <span>Weekly Mowing</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200 cursor-pointer">
+                                <input type="checkbox" id="chk-trim" checked onchange="calculateEstimate()" class="accent-brand-deep">
+                                <span>Edging & Trimming</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200 cursor-pointer">
+                                <input type="checkbox" id="chk-fertilizer" onchange="calculateEstimate()" class="accent-brand-deep">
+                                <span>Fertilizer Treatment</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200 cursor-pointer">
+                                <input type="checkbox" id="chk-aeration" onchange="calculateEstimate()" class="accent-brand-deep">
+                                <span>Aeration / Seeding</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estimate Result Display -->
+                <div class="md:col-span-5 bg-brand-deep text-white p-6 rounded-xl text-center space-y-4 shadow-lg">
+                    <p class="text-xs uppercase tracking-widest text-emerald-300 font-semibold">Estimated Monthly Total</p>
+                    <div class="text-4xl font-extrabold text-amber-400">Kshs <span id="estimated-price">120</span><span class="text-sm font-normal text-gray-300">/mo</span></div>
+                    <p class="text-xs text-gray-300">Final price verified upon on-site measurement.</p>
+                    <button onclick="applyEstimateToQuote()" class="w-full bg-brand-accent hover:bg-amber-600 text-white font-bold py-3 rounded-lg text-sm transition">
+                        Lock in Estimate Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. BEFORE & AFTER SPLIT SCREEN SLIDER -->
+    <section id="gallery" class="py-20 container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-12 space-y-3">
+            <span class="text-brand-accent font-bold uppercase tracking-wider text-xs">Proven Results</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-deep">Interactive Transformations</h2>
+            <p class="text-gray-600">Drag the slider horizontally to view dramatic before and after lawn revamps.</p>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+            <div id="ba-slider" class="ba-container h-[350px] sm:h-[450px] rounded-2xl shadow-xl border border-gray-200">
+                <!-- After Image (Background) -->
+                <img id="gallery-after-img" src="https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80" alt="After Transformation" class="absolute inset-0 w-full h-full object-cover">
+                <span class="absolute top-4 right-4 bg-brand-deep/80 text-white text-xs font-bold px-3 py-1 rounded">AFTER</span>
+
+                <!-- Before Image (Overlay Container) -->
+                <div class="ba-overlay" id="ba-overlay">
+                    <img id="gallery-before-img" src="https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80" alt="Before Transformation" class="absolute inset-0 w-full h-full object-cover max-w-none" style="width: 100%;">
+                    <span class="absolute top-4 left-4 bg-black/70 text-white text-xs font-bold px-3 py-1 rounded">BEFORE</span>
+                </div>
+
+                <!-- Slider Handle -->
+                <div class="ba-slider-handle" id="ba-handle">
+                    <i class="fa-solid fa-arrows-left-right text-xs"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. INTERACTIVE 2D YARD VISUALIZER (LUXURY) -->
+    <section id="visualizer" class="py-16 bg-gray-900 text-white">
+        <div class="container mx-auto px-4 max-w-5xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <span class="text-amber-400 font-bold uppercase tracking-wider text-xs">Interactive Design Tool</span>
+                    <h2 class="text-3xl font-extrabold text-white">Drag-and-Place Yard Planner</h2>
+                    <p class="text-sm text-gray-400">Add landscaping features, then drag them anywhere on the lawn to build your ideal layout.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="clearCanvas()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-bold transition">Clear Canvas</button>
+                    <button onclick="saveYardDesign()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-xs font-bold transition">Save Layout</button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-6 items-start">
+                <div class="md:col-span-3 bg-gray-800 p-4 rounded-xl space-y-3 border border-gray-700">
+                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Add Elements:</p>
+                    <button onclick="addYardItem('tree')" class="yard-tool w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-tree text-emerald-400 text-base"></i>
+                        <span>Shade Tree</span>
+                    </button>
+                    <button onclick="addYardItem('flower')" class="yard-tool w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-seedling text-pink-400 text-base"></i>
+                        <span>Flower Bed</span>
+                    </button>
+                    <button onclick="addYardItem('patio')" class="yard-tool w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-border-all text-amber-400 text-base"></i>
+                        <span>Stone Patio</span>
+                    </button>
+                    <button onclick="addYardItem('pool')" class="yard-tool w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-water text-blue-400 text-base"></i>
+                        <span>Water Feature</span>
+                    </button>
+                    <button onclick="deleteSelectedYardItem()" class="w-full text-left bg-red-700 hover:bg-red-800 p-3 rounded-lg text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-trash text-red-200 text-base"></i>
+                        <span>Delete Selected</span>
+                    </button>
+                </div>
+
+                <div class="md:col-span-9 bg-emerald-950/80 rounded-xl border-2 border-dashed border-emerald-600 relative overflow-hidden min-h-[420px]" id="yard-canvas">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:28px_28px]"></div>
+                    <p class="absolute bottom-3 right-3 text-xs text-emerald-400/50 pointer-events-none">Green Grid Lawn (Canvas Box)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. MULTI-STEP LEAD GENERATION / QUOTE FORM -->
+    <section id="quote" class="py-20 container mx-auto px-4 max-w-3xl">
+        <div class="bg-white rounded-2xl p-8 sm:p-12 shadow-xl border border-gray-100">
+            <div class="text-center space-y-2 mb-8">
+                <span class="text-brand-accent font-bold uppercase tracking-wider text-xs">Get Started Today</span>
+                <h2 class="text-3xl font-extrabold text-brand-deep">Request Your Custom Quote</h2>
+                <p class="text-sm text-gray-500">Fill out this quick form and our team will get back to you within 24 hours.</p>
+            </div>
+
+            <form onsubmit="submitLeadForm(event)" class="space-y-6">
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-700 uppercase mb-1 block">Full Name</label>
+                        <input type="text" required placeholder="John Doe" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-deep focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-700 uppercase mb-1 block">Phone Number</label>
+                        <input type="tel" required placeholder="07xx xxx xxx" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-deep focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-700 uppercase mb-1 block">Primary Service Required</label>
+                        <select id="quote-service-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-deep focus:outline-none">
+                            <option>Lawn Maintenance</option>
+                            <option>Hardscaping</option>
+                            <option>Garden Design</option>
+                            <option>Irrigation Setup</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-700 uppercase mb-1 block">Preferred Service Date</label>
+                        <input type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-deep focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 uppercase mb-1 block">Project Notes / Property Details</label>
+                    <textarea id="quote-notes" rows="3" placeholder="Tell us about your property size, specific requests, or questions..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-deep focus:outline-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-accent hover:bg-amber-600 text-white font-bold py-4 rounded-xl text-base shadow-lg transition transform active:scale-98">
+                    Submit Quote Request <i class="fa-solid fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- CUSTOMER REVIEWS -->
+    <section id="reviews" class="py-20 bg-white border-y border-gray-200">
+        <div class="container mx-auto px-4 max-w-5xl">
+            <div class="text-center space-y-3 mb-10">
+                <span class="text-brand-accent font-bold uppercase tracking-wider text-xs">Customer Experiences</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-deep">Reviews for Aspen Leaf Scape Ltd</h2>
+                <p class="text-amber-500 font-bold" aria-label="Google rating 4.8 out of 5 from 21 reviews">★★★★★ <span class="text-brand-deep">4.8</span> <span class="text-sm text-gray-500 font-normal">(21 reviews)</span></p>
+                <p class="text-sm text-gray-600">Share your experience. Submitted reviews are published on this page.</p>
+            </div>
+            <div class="grid lg:grid-cols-5 gap-8 items-start">
+                <form id="customer-review-form" onsubmit="submitCustomerReview(event)" class="lg:col-span-2 bg-brand-light border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4">
+                    <h3 class="font-bold text-brand-deep">Leave a review</h3>
+                    <label class="block text-xs font-bold text-gray-700">Your name<input name="name" required minlength="2" maxlength="60" autocomplete="name" class="mt-1 w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-deep focus:outline-none"></label>
+                    <label class="block text-xs font-bold text-gray-700">Rating<select name="rating" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-deep focus:outline-none"><option value="">Select a rating</option><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></label>
+                    <label class="block text-xs font-bold text-gray-700">Your review<textarea name="message" required minlength="10" maxlength="1200" rows="4" class="mt-1 w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-deep focus:outline-none" placeholder="Tell us about your experience"></textarea></label>
+                    <label class="absolute -left-[10000px]" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1" autocomplete="off"></label>
+                    <p class="text-[11px] text-gray-500">Your name and review will be publicly visible.</p>
+                    <button type="submit" class="w-full bg-brand-deep hover:bg-emerald-900 text-white font-bold py-3 rounded-lg text-sm"><i class="fa-solid fa-star mr-2"></i>Submit Review</button>
+                    <p id="customer-review-status" role="status" aria-live="polite" class="text-xs font-semibold text-gray-600"></p>
+                </form>
+                <div class="lg:col-span-3">
+                    <div id="customer-reviews" class="grid sm:grid-cols-2 gap-4" aria-live="polite"><p class="text-sm text-gray-500">Loading customer reviews...</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. CLIENT PORTAL SECTION (MODAL VIEW) -->
+    <section id="portal" class="py-16 bg-brand-light border-t border-gray-200">
+        <div class="container mx-auto px-4 text-center max-w-2xl space-y-4">
+            <i class="fa-solid fa-user-shield text-4xl text-brand-deep"></i>
+            <h2 class="text-2xl font-bold text-brand-deep">Existing Client Portal</h2>
+            <p class="text-sm text-gray-600">Access your active service schedule, past invoice history, and manage recurring payments.</p>
+            <button onclick="togglePortalModal(true)" class="bg-brand-deep hover:bg-emerald-900 text-white font-semibold px-6 py-3 rounded-lg text-sm transition">
+                Open Client Account Portal
+            </button>
+        </div>
+    </section>
+
+    <!-- CLIENT PORTAL MODAL -->
+    <div id="portal-modal" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-6 relative shadow-2xl">
+            <button onclick="togglePortalModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-brand-deep border-b pb-3">Client Portal Account</h3>
+            
+            <div class="space-y-3">
+                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-gray-500">Next Scheduled Visit</p>
+                        <p class="font-bold text-brand-deep text-sm">Tomorrow, 9:00 AM (Weekly Mowing)</p>
+                    </div>
+                    <span class="bg-emerald-200 text-emerald-800 text-xs px-2 py-1 rounded font-bold">Confirmed</span>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-gray-500">Latest Invoice #1084</p>
+                        <p class="font-bold text-gray-800 text-sm">Kshs 120.00 (Due Sept 30)</p>
+                    </div>
+                    <button onclick="alert('Demo: Redirecting to payment processor...')" class="bg-brand-accent text-white text-xs px-3 py-1.5 rounded font-bold hover:bg-amber-600">Pay Now</button>
+                </div>
+            </div>
+            
+            <button onclick="togglePortalModal(false)" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold py-2.5 rounded-lg">Close Portal</button>
+        </div>
+    </div>
+
+    <!-- 9. AI CHATBOT WIDGET (LUXURY) -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button onclick="toggleChatbot()" class="w-14 h-14 bg-brand-deep text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-emerald-900 transition transform hover:scale-105 border-2 border-amber-400">
+            <i class="fa-solid fa-comments"></i>
+        </button>
+
+        <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[420px]">
+            <div class="bg-brand-deep text-white p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-robot text-amber-400"></i>
+                    <span class="font-bold text-sm">Aspen Leaf Scape Assistant</span>
+                </div>
+                <button onclick="toggleChatbot()" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+                <div class="bg-gray-100 p-3 rounded-lg max-w-[85%] text-gray-800">
+                    Hello! I'm your AI Lawn Care assistant. Ask me about grass types, watering schedules, or instant service estimates!
+                </div>
+            </div>
+            <div class="p-3 border-t flex space-x-2 bg-gray-50">
+                <input type="text" id="chat-input" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendChatMessage()" class="flex-1 px-3 py-2 border rounded-lg text-xs focus:outline-none">
+                <button onclick="sendChatMessage()" class="bg-brand-deep text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-white py-12 border-t border-gray-800">
+        <div class="container mx-auto px-4 grid md:grid-cols-4 gap-8 text-sm">
+            <div class="space-y-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded bg-brand-deep flex items-center justify-center text-white font-bold text-lg">
+                        <i class="fa-solid fa-leaf text-amber-400"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight">ASPEN LEAF SCAPE LTD</span>
+                </div>
+                <p class="text-gray-400 text-xs leading-relaxed">Premier landscaping, irrigation engineering, and groundskeeping for properties of distinction.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-amber-400 uppercase text-xs tracking-wider mb-3">Quick Links</h4>
+                <ul class="space-y-2 text-gray-300 text-xs">
+                    <li><a href="#services" class="hover:text-white">Services</a></li>
+                    <li><a href="#estimator" class="hover:text-white">Cost Estimator</a></li>
+                    <li><a href="#gallery" class="hover:text-white">Gallery</a></li>
+                    <li><a href="#reviews" class="hover:text-white">Customer Reviews</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-amber-400 uppercase text-xs tracking-wider mb-3">Service Hours</h4>
+                <p class="text-gray-300 text-xs">Mon - Fri: 7:00 AM - 6:00 PM</p>
+                <p class="text-gray-300 text-xs mt-1">Sat: 8:00 AM - 3:00 PM</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-amber-400 uppercase text-xs tracking-wider mb-3">Contact</h4>
+                <a href="tel:+254743313867" class="text-gray-300 text-xs hover:text-white"><i class="fa-solid fa-phone mr-2"></i>0743 313867</a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 pt-8 mt-8 border-t border-gray-800 text-center text-xs text-gray-500">
+            © <script>document.write(new Date().getFullYear())</script> ASPEN LEAF SCAPE LTD.
+        </div>
+    </footer>
+
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        const STORAGE_KEY = 'verdant-edge-site-data-v2';
+        const YARD_LAYOUT_KEY = 'verdant-edge-yard-layout';
+
+        let siteData = {
+            heroHeadline: 'Transforming Lawns into Living Masterpieces',
+            heroSubtitle: 'Full-service landscaping, automated care schedules, and custom hardscaping.',
+            mowingPrice: '45',
+            hardscapePrice: '1200',
+            designPrice: '350',
+            estimatorBaseRate: 120,
+            estimatorPer1000: 8,
+            heroBgUrl: 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80',
+            beforeImageUrl: 'https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80',
+            afterImageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80',
+            serviceItems: [
+                {
+                    id: 'mowing',
+                    title: 'Lawn Care & Maintenance',
+                    description: 'Precision mowing, edging, fertilization, weed control, and seasonal aeration.',
+                    price: 45,
+                    image: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=800&q=80'
+                },
+                {
+                    id: 'hardscape',
+                    title: 'Hardscaping & Pavers',
+                    description: 'Custom patio installation, retaining walls, stone walkways, and fire pits.',
+                    price: 1200,
+                    image: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80'
+                },
+                {
+                    id: 'design',
+                    title: 'Garden Design & Planting',
+                    description: 'Native plant selection, mulch beds, flower installation, and shrub sculpting.',
+                    price: 350,
+                    image: 'https://images.unsplash.com/photo-1557429287-b2e26467fc2b?auto=format&fit=crop&w=800&q=80'
+                }
+            ]
+        };
+
+        let yardItems = [];
+
+        function escapeHtml(value = '') {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function loadSiteData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) return;
+                const parsed = JSON.parse(saved);
+                siteData = { ...siteData, ...parsed };
+                if (!Array.isArray(siteData.serviceItems) || !siteData.serviceItems.length) {
+                    siteData.serviceItems = [...siteData.serviceItems || []];
+                }
+            } catch (error) {
+                console.warn('Unable to restore saved site data:', error);
+            }
+        }
+
+        function saveSiteData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+        }
+
+        function getServicePriceById(serviceId) {
+            const item = siteData.serviceItems.find((service) => service.id === serviceId);
+            return item ? Number(item.price || 0) : 0;
+        }
+
+        function formatKshs(amount) {
+            return Number(amount || 0).toLocaleString('en-KE');
+        }
+
+        function renderServices() {
+            const container = document.getElementById('services-list');
+            if (!container) return;
+
+            if (!siteData.serviceItems.length) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-600">No services available. Add one in the admin panel.</div>';
+                return;
+            }
+
+            container.innerHTML = siteData.serviceItems.map((service) => `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition group">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="${service.image || 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=800&q=80'}" alt="${escapeHtml(service.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 right-3 bg-brand-deep/90 text-amber-300 text-xs font-bold px-3 py-1 rounded-full">
+                            From Kshs ${formatKshs(service.price)}${service.id === 'mowing' ? '/visit' : ''}
+                        </span>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <h3 class="text-xl font-bold text-brand-deep">${escapeHtml(service.title)}</h3>
+                        <p class="text-sm text-gray-600">${escapeHtml(service.description)}</p>
+                        <a href="#quote" data-book-service="${escapeHtml(service.title)}" class="inline-flex items-center text-sm font-semibold text-brand-accent hover:underline pt-2">
+                            Book This Service <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function syncGalleryImages() {
+            const beforeImg = document.getElementById('gallery-before-img');
+            const afterImg = document.getElementById('gallery-after-img');
+            if (beforeImg) beforeImg.src = siteData.beforeImageUrl || 'https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80';
+            if (afterImg) afterImg.src = siteData.afterImageUrl || 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80';
+        }
+
+        function syncSiteDataToUI() {
+            const headline = document.getElementById('dyn-hero-headline');
+            const subtitle = document.getElementById('dyn-hero-subtitle');
+            const price = document.getElementById('dyn-price-mowing');
+            const heroBg = document.getElementById('hero-bg');
+
+            if (headline) headline.innerText = siteData.heroHeadline || 'Transforming Lawns into Living Masterpieces';
+            if (subtitle) subtitle.innerText = siteData.heroSubtitle || 'Full-service landscaping, automated care schedules, and custom hardscaping.';
+            if (price) price.innerText = getServicePriceById('mowing') || siteData.mowingPrice || '45';
+            if (heroBg) heroBg.style.backgroundImage = `url('${siteData.heroBgUrl || 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80'}')`;
+
+            renderServices();
+            syncGalleryImages();
+            document.getElementById('quote-service-select')?.querySelectorAll('option')?.forEach((option) => {
+                if (!option.value) option.value = option.textContent;
+            });
+        }
+
+        function clearCanvas() {
+            yardItems = [];
+            renderYardLayout();
+            localStorage.removeItem(YARD_LAYOUT_KEY);
+        }
+
+        function renderYardLayout() {
+            const canvas = document.getElementById('yard-canvas');
+            if (!canvas) return;
+
+            const itemDefs = {
+                tree: { icon: 'fa-tree', bg: 'bg-emerald-800/60', text: 'text-emerald-200' },
+                flower: { icon: 'fa-seedling', bg: 'bg-pink-800/60', text: 'text-pink-200' },
+                patio: { icon: 'fa-border-all', bg: 'bg-amber-700/70', text: 'text-amber-200' },
+                pool: { icon: 'fa-water', bg: 'bg-blue-800/60', text: 'text-blue-200' }
+            };
+
+            canvas.querySelectorAll('[data-yard-item]').forEach((node) => node.remove());
+
+            yardItems.forEach((item) => {
+                const config = itemDefs[item.type] || itemDefs.tree;
+                const element = document.createElement('button');
+                element.type = 'button';
+                element.dataset.yardItem = 'true';
+                element.dataset.id = item.id;
+                element.className = `absolute flex items-center justify-center rounded-full ${config.bg} border border-white/20 shadow-lg cursor-grab active:cursor-grabbing w-12 h-12`;
+                element.style.left = `${item.x}%`;
+                element.style.top = `${item.y}%`;
+                element.style.transform = 'translate(-50%, -50%)';
+                element.innerHTML = `<i class="fa-solid ${config.icon} ${config.text} text-xl"></i>`;
+
+                element.addEventListener('pointerdown', (event) => {
+                    event.preventDefault();
+                    const activeId = event.currentTarget.dataset.id;
+                    canvas.dataset.activeItemId = activeId;
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                });
+
+                canvas.appendChild(element);
+            });
+        }
+
+        function addYardItem(type, x = 50, y = 50) {
+            yardItems.push({
+                id: `yard-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
+                type,
+                x,
+                y
+            });
+            renderYardLayout();
+            saveYardDesign();
+        }
+
+        function deleteSelectedYardItem() {
+            const canvas = document.getElementById('yard-canvas');
+            if (!canvas || !canvas.dataset.activeItemId) return;
+            yardItems = yardItems.filter((item) => item.id !== canvas.dataset.activeItemId);
+            canvas.dataset.activeItemId = '';
+            renderYardLayout();
+            saveYardDesign();
+        }
+
+        function saveYardDesign() {
+            localStorage.setItem(YARD_LAYOUT_KEY, JSON.stringify(yardItems));
+        }
+
+        function restoreYardLayout() {
+            try {
+                const stored = localStorage.getItem(YARD_LAYOUT_KEY);
+                if (!stored) return;
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    yardItems = parsed;
+                }
+            } catch (error) {
+                console.warn('Unable to restore yard design:', error);
+            }
+            renderYardLayout();
+        }
+
+        function fetchWeatherAdvice() {
+            const weatherEl = document.getElementById('weather-info');
+            if (!weatherEl) return;
+
+            const tips = [
+                'Spring Season: Optimal time for lawn aeration and weed pre-emergent treatment.',
+                'Summer Hydration: Water lawns early morning at 5:00 AM for maximum absorption.',
+                'Autumn Care: Schedule leaf removal to prevent grass suffocation before winter.'
+            ];
+            weatherEl.innerText = tips[Math.floor(Math.random() * tips.length)];
+        }
+
+        function checkZipCode(e) {
+            e.preventDefault();
+            const zip = document.getElementById('zip-input').value.trim();
+            const res = document.getElementById('zip-result');
+            res.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-red-100', 'text-red-800');
+
+            if (!/^\d{5}$/.test(zip)) {
+                res.classList.add('bg-red-100', 'text-red-800');
+                res.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Please enter a valid 5-digit ZIP code.';
+                return;
+            }
+
+            if (['1', '3', '9'].some(prefix => zip.startsWith(prefix))) {
+                res.classList.add('bg-emerald-100', 'text-emerald-800');
+                res.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Great news! We service your area. Book below.';
+            } else {
+                res.classList.add('bg-red-100', 'text-red-800');
+                res.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> We are expanding! Contact us to check custom routing.';
+            }
+        }
+
+        function calculateEstimate() {
+            const slider = document.getElementById('lawn-size');
+            const size = parseInt(slider?.value || '5000', 10) || 0;
+            const sizeLabel = document.getElementById('lawn-size-val');
+            if (sizeLabel) sizeLabel.innerText = size.toLocaleString() + ' sq ft';
+
+            const base = Number(siteData.estimatorBaseRate || 120);
+            const per1000 = Number(siteData.estimatorPer1000 ?? 8);
+            let total = base + (size / 1000) * per1000;
+
+            if (document.getElementById('chk-mow').checked) total += 40;
+            if (document.getElementById('chk-trim').checked) total += 20;
+            if (document.getElementById('chk-fertilizer').checked) total += 35;
+            if (document.getElementById('chk-aeration').checked) total += 50;
+
+            const priceEl = document.getElementById('estimated-price');
+            if (priceEl) priceEl.innerText = formatKshs(Math.round(total));
+        }
+
+        function applyEstimateToQuote() {
+            const price = document.getElementById('estimated-price').innerText;
+            const size = document.getElementById('lawn-size-val').innerText;
+            const notes = document.getElementById('quote-notes');
+            notes.value = `Calculated Estimate: ~Kshs ${price}/mo for ${size} property size.`;
+            document.getElementById('quote').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function preselectService(serviceName) {
+            const select = document.getElementById('quote-service-select');
+            if (select) select.value = serviceName;
+        }
+
+        function submitLeadForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Request Sent';
+            }
+
+            alert('Thank you! Your quote request has been submitted successfully. Our team will contact you shortly.');
+            form.reset();
+
+            if (submitButton) {
+                setTimeout(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Submit Quote Request <i class="fa-solid fa-paper-plane ml-2"></i>';
+                }, 1800);
+            }
+        }
+
+        const screenshotReviews = [
+            { id: 'screenshot-benard', name: 'Benard Njau kigo', rating: 5, message: 'Thank you Aspen you are the best I recommend' },
+            { id: 'screenshot-paul', name: 'Paul Kahuria', rating: 5, message: "Aspen you did an awesome work 💯 into my mother's home. Thank you God bless you ..." },
+            { id: 'screenshot-lawrence', name: 'Lawrence Kimani', rating: 5, message: 'Thanks 👍 alot you are the best aspen ...' },
+            { id: 'screenshot-dishon', name: 'Dishon Kinyanjui', rating: 5, message: 'Great work 👏 from aspen. Thank you very much ...' },
+            { id: 'screenshot-leonard', name: 'Leonard Gikati', rating: 5, message: 'The best team ever.....good work I highly recommend you work with aspen group .......', ownerResponse: 'Welcome Leonard' }
+        ];
+
+        function renderCustomerReviews(reviews) {
+            const container = document.getElementById('customer-reviews');
+            if (!reviews.length) {
+                container.innerHTML = '<p class="sm:col-span-2 text-sm text-gray-500">No reviews yet. You can be the first to share your experience.</p>';
+                return;
+            }
+            container.innerHTML = reviews.map((review) => {
+                const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
+                const date = new Date(review.createdAt);
+                const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
+                const ownerResponse = review.ownerResponse ? `<p class="mt-4 border-l-2 border-brand-accent pl-3 text-xs text-gray-600"><span class="font-bold">Response from the owner</span><br>${escapeHtml(review.ownerResponse)}</p>` : '';
+                return `<article class="border border-gray-200 rounded-xl p-5 shadow-sm"><div class="flex items-center justify-between gap-3"><h3 class="font-bold text-brand-deep">${escapeHtml(review.name)}</h3><span class="text-amber-500" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span></div><p class="mt-3 text-sm text-gray-700 whitespace-pre-wrap">${escapeHtml(review.message)}</p>${dateLabel ? `<p class="mt-3 text-[11px] text-gray-500">${dateLabel}</p>` : ''}${ownerResponse}</article>`;
+            }).join('');
+        }
+
+        async function loadCustomerReviews() {
+            const container = document.getElementById('customer-reviews');
+            renderCustomerReviews(screenshotReviews);
+            try {
+                const response = await fetch('/api/reviews');
+                if (!response.ok) throw new Error('Reviews are temporarily unavailable.');
+                const data = await response.json();
+                const savedReviews = Array.isArray(data.reviews) ? data.reviews : [];
+                renderCustomerReviews([...savedReviews, ...screenshotReviews]);
+            } catch (error) {
+                console.warn('Could not load submitted reviews; showing the screenshot reviews.', error);
+            }
+        }
+
+        async function submitCustomerReview(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const button = form.querySelector('button[type="submit"]');
+            const status = document.getElementById('customer-review-status');
+            const formData = new FormData(form);
+            button.disabled = true;
+            status.textContent = 'Submitting your review...';
+            try {
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.fromEntries(formData.entries()))
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Your review could not be submitted.');
+                form.reset();
+                status.textContent = 'Thank you. Your review has been saved and published.';
+                await loadCustomerReviews();
+            } catch (error) {
+                status.textContent = `${error.message} Please try again later.`;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        function initBeforeAfterSlider() {
+            const slider = document.getElementById('ba-slider');
+            const overlay = document.getElementById('ba-overlay');
+            const handle = document.getElementById('ba-handle');
+            if (!slider || !overlay || !handle) return;
+
+            let isDragging = false;
+
+            const updateSlider = (x) => {
+                const rect = slider.getBoundingClientRect();
+                let position = x - rect.left;
+                if (position < 0) position = 0;
+                if (position > rect.width) position = rect.width;
+                const percentage = (position / rect.width) * 100;
+                overlay.style.width = percentage + '%';
+                handle.style.left = percentage + '%';
+            };
+
+            slider.addEventListener('pointerdown', (event) => {
+                isDragging = true;
+                updateSlider(event.clientX);
+            });
+
+            handle.addEventListener('pointerdown', (event) => {
+                isDragging = true;
+                event.stopPropagation();
+                updateSlider(event.clientX);
+            });
+
+            window.addEventListener('pointermove', (event) => {
+                if (isDragging) updateSlider(event.clientX);
+            });
+
+            window.addEventListener('pointerup', () => {
+                isDragging = false;
+            });
+
+            window.addEventListener('pointercancel', () => {
+                isDragging = false;
+            });
+
+            updateSlider(slider.getBoundingClientRect().left + slider.getBoundingClientRect().width / 2);
+        }
+
+        function toggleChatbot() {
+            document.getElementById('chat-window').classList.toggle('hidden');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const messages = document.getElementById('chat-messages');
+            if (!input.value.trim()) return;
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'bg-brand-deep text-white p-3 rounded-lg max-w-[85%] ml-auto text-xs';
+            userMsg.innerText = input.value;
+            messages.appendChild(userMsg);
+
+            const botMsg = document.createElement('div');
+            botMsg.className = 'bg-gray-100 p-3 rounded-lg max-w-[85%] text-gray-800 text-xs';
+
+            const q = input.value.toLowerCase();
+            if (q.includes('price') || q.includes('cost')) {
+                botMsg.innerText = `Lawn mowing starts at Kshs ${formatKshs(getServicePriceById('mowing') || 45)}/visit depending on yard square footage. Try our Instant Estimator tool above!`;
+            } else if (q.includes('water') || q.includes('schedule')) {
+                botMsg.innerText = 'We recommend watering 2-3 times per week early in the morning for optimal root penetration.';
+            } else {
+                botMsg.innerText = 'Thanks for your question! You can request a detailed free quote using our online form.';
+            }
+
+            setTimeout(() => {
+                messages.appendChild(botMsg);
+                messages.scrollTop = messages.scrollHeight;
+            }, 500);
+
+            input.value = '';
+        }
+
+        function togglePortalModal(show) {
+            document.getElementById('portal-modal').classList.toggle('hidden', !show);
+        }
+
+        document.addEventListener('click', (event) => {
+            const bookServiceButton = event.target.closest('[data-book-service]');
+            if (bookServiceButton) {
+                preselectService(bookServiceButton.dataset.bookService);
+            }
+        });
+
+        document.addEventListener('pointermove', (event) => {
+            const canvas = document.getElementById('yard-canvas');
+            if (!canvas || !canvas.dataset.activeItemId) return;
+
+            const item = yardItems.find((entry) => entry.id === canvas.dataset.activeItemId);
+            if (!item) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
+            const y = Math.min(Math.max(event.clientY - rect.top, 0), rect.height);
+            item.x = (x / rect.width) * 100;
+            item.y = (y / rect.height) * 100;
+            renderYardLayout();
+            saveYardDesign();
+        });
+
+        document.addEventListener('pointerup', () => {
+            const canvas = document.getElementById('yard-canvas');
+            if (canvas) canvas.dataset.activeItemId = '';
+        });
+
+        window.onload = function() {
+            loadSiteData();
+            syncSiteDataToUI();
+            calculateEstimate();
+            initBeforeAfterSlider();
+            fetchWeatherAdvice();
+            restoreYardLayout();
+            loadCustomerReviews();
+        };
+    </script>
+</body>
+</html>

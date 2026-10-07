@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Admin | Aspen Leaf Scape Ltd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            deep: '#1E3A2B',
+                            light: '#F9F8F3',
+                            accent: '#D97706',
+                            sage: '#4A6B5D',
+                            dark: '#111827'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f3f5ef; color: #1f2937; }
+        .admin-tile { background: linear-gradient(180deg, #fff 0%, #f8fafc 100%); border: 1px solid #dfe7e1; border-left: 4px solid #1E3A2B; box-shadow: 0 12px 28px rgba(15, 23, 42, .08); }
+        .admin-input { transition: border-color .2s ease, box-shadow .2s ease; }
+        .admin-input:focus { border-color: #1E3A2B; box-shadow: 0 0 0 3px rgba(30, 58, 43, .1); outline: none; }
+        .admin-thumb { width: 100%; height: 120px; object-fit: cover; border: 1px solid #e5e7eb; border-radius: .75rem; background: #f3f4f6; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-brand-deep text-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-5 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 text-xl"><i class="fa-solid fa-sliders"></i></div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold">Site Settings</h1>
+                    <p class="text-xs text-emerald-100">ASPEN LEAF SCAPE LTD admin</p>
+                </div>
+            </div>
+            <a href="landscaping_fullstack_application.html" class="px-4 py-2 rounded-lg border border-white/30 hover:bg-white/10 text-sm font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Back to Home</a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+        <form id="admin-form" class="space-y-6" onsubmit="publishToGitHub(event)">
+            <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid fa-pen-to-square text-brand-accent mt-1"></i>
+                    <div><h2 class="font-bold text-brand-deep">Hero Text & Estimator Pricing</h2><p class="text-xs text-gray-500 mt-1">Changes the homepage headline, subtitle, and monthly estimate calculation.</p></div>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <label class="text-xs font-semibold text-gray-700">Hero headline<input type="text" id="admin-hero-headline" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Hero subtitle<input type="text" id="admin-hero-subtitle" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Estimator base monthly rate (Kshs)<input type="number" min="0" step="1" id="admin-estimator-base-rate" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Estimator cost per 1,000 sq ft (Kshs)<input type="number" min="0" step="0.5" id="admin-estimator-per-1000" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                </div>
+            </section>
+
+            <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-3"><i class="fa-solid fa-leaf text-brand-accent mt-1"></i><div><h2 class="font-bold text-brand-deep">Homepage Service Cards & Prices</h2><p class="text-xs text-gray-500 mt-1">Add, edit, or remove services shown on the homepage.</p></div></div>
+                </div>
+                <div id="admin-services-list" class="space-y-3"></div>
+                <button type="button" onclick="addServiceItem()" class="w-full px-3 py-2.5 bg-brand-deep text-white rounded-lg text-xs font-bold hover:bg-emerald-900"><i class="fa-solid fa-plus mr-1"></i>Add Service</button>
+            </section>
+
+            <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-start gap-3"><i class="fa-solid fa-images text-brand-accent mt-1"></i><div><h2 class="font-bold text-brand-deep">Homepage Hero & Before/After Photos</h2><p class="text-xs text-gray-500 mt-1">These images appear in the main banner and transformation slider.</p></div></div>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div class="space-y-2"><label for="admin-hero-img-url" class="text-xs font-semibold text-gray-700">Hero background image URL</label><img id="admin-preview-hero" class="admin-thumb" alt="Hero image preview"><input type="text" inputmode="url" id="admin-hero-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-hero" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleImageUpload('hero')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Use uploaded image</button></div>
+                    <div class="space-y-2"><label for="admin-before-img-url" class="text-xs font-semibold text-gray-700">Before photo URL</label><img id="admin-preview-before" class="admin-thumb" alt="Before image preview"><input type="text" inputmode="url" id="admin-before-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-before" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleImageUpload('before')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Use uploaded image</button></div>
+                    <div class="space-y-2"><label for="admin-after-img-url" class="text-xs font-semibold text-gray-700">After photo URL</label><img id="admin-preview-after" class="admin-thumb" alt="After image preview"><input type="text" inputmode="url" id="admin-after-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-after" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleImageUpload('after')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Use uploaded image</button></div>
+                </div>
+            </section>
+
+            <details class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <summary class="cursor-pointer font-bold text-sm text-amber-950">Optional GitHub publishing settings</summary>
+                <p class="text-xs text-amber-900 mt-2 mb-4">Local changes are saved in this browser. Add a token and repository to also publish the settings JSON to GitHub.</p>
+                <div class="grid sm:grid-cols-3 gap-3">
+                    <label class="text-xs font-semibold text-amber-950">GitHub token<input type="password" id="gh-token" autocomplete="off" class="mt-1 w-full p-2.5 border border-amber-300 rounded-lg text-sm" placeholder="ghp_..."></label>
+                    <label class="text-xs font-semibold text-amber-950">Repository owner<input type="text" id="gh-owner" class="mt-1 w-full p-2.5 border border-amber-300 rounded-lg text-sm" placeholder="username"></label>
+                    <label class="text-xs font-semibold text-amber-950">Repository name<input type="text" id="gh-repo" class="mt-1 w-full p-2.5 border border-amber-300 rounded-lg text-sm" placeholder="repository"></label>
+                </div>
+            </details>
+
+            <div class="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 bg-[#f3f5ef]/95 py-4 backdrop-blur">
+                <p id="save-status" role="status" class="text-xs font-semibold text-emerald-800">Changes are saved in this browser.</p>
+                <div class="flex gap-3"><a href="landscaping_fullstack_application.html" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-semibold">Cancel</a><button type="submit" class="px-5 py-2.5 bg-brand-accent hover:bg-amber-700 text-white rounded-lg text-sm font-bold"><i class="fa-solid fa-floppy-disk mr-2"></i>Save Settings</button></div>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const STORAGE_KEY = 'verdant-edge-site-data-v2';
+        const defaultSiteData = {
+            heroHeadline: 'Transforming Lawns into Living Masterpieces',
+            heroSubtitle: 'Full-service landscaping, automated care schedules, and custom hardscaping.',
+            mowingPrice: '45',
+            hardscapePrice: '1200',
+            designPrice: '350',
+            estimatorBaseRate: 120,
+            estimatorPer1000: 8,
+            heroBgUrl: 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80',
+            beforeImageUrl: 'https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80',
+            afterImageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80',
+            serviceItems: [
+                { id: 'mowing', title: 'Lawn Care & Maintenance', description: 'Precision mowing, edging, fertilization, weed control, and seasonal aeration.', price: 45, image: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=800&q=80' },
+                { id: 'hardscape', title: 'Hardscaping & Pavers', description: 'Custom patio installation, retaining walls, stone walkways, and fire pits.', price: 1200, image: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80' },
+                { id: 'design', title: 'Garden Design & Planting', description: 'Native plant selection, mulch beds, flower installation, and shrub sculpting.', price: 350, image: 'https://images.unsplash.com/photo-1557429287-b2e26467fc2b?auto=format&fit=crop&w=800&q=80' }
+            ]
+        };
+        let siteData = structuredClone(defaultSiteData);
+
+        function escapeHtml(value = '') {
+            return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function saveSiteData(message = 'Changes are saved in this browser.') {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+                document.getElementById('save-status').textContent = message;
+            } catch (error) {
+                document.getElementById('save-status').textContent = 'Could not save. Uploaded images may exceed browser storage limits.';
+            }
+        }
+
+        function renderServiceEditor() {
+            const container = document.getElementById('admin-services-list');
+            container.innerHTML = siteData.serviceItems.length ? siteData.serviceItems.map((service, index) => `
+                <article class="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <label class="text-[10px] uppercase font-bold text-gray-600">Service title<input data-service-field="title" data-index="${index}" value="${escapeHtml(service.title)}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case"></label>
+                        <label class="text-[10px] uppercase font-bold text-gray-600">Price (Kshs)<input data-service-field="price" data-index="${index}" type="number" min="0" step="1" value="${Number(service.price || 0)}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case"></label>
+                    </div>
+                    <label class="block text-[10px] uppercase font-bold text-gray-600">Service image URL<input data-service-field="image" data-index="${index}" value="${escapeHtml(service.image || '')}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case" placeholder="https://example.com/image.jpg"></label>
+                    <label class="block text-[10px] uppercase font-bold text-gray-600">Upload service image<input data-service-upload="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs normal-case"></label>
+                    <label class="block text-[10px] uppercase font-bold text-gray-600">Description<textarea data-service-field="description" data-index="${index}" rows="2" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case">${escapeHtml(service.description || '')}</textarea></label>
+                    <div class="flex justify-end"><button type="button" data-remove-service="${index}" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-bold"><i class="fa-solid fa-trash mr-1"></i>Remove service</button></div>
+                </article>`).join('') : '<p class="rounded-lg border border-dashed p-4 text-sm text-gray-500">No services yet. Add a service to get started.</p>';
+        }
+
+        function populateAdminFields() {
+            document.getElementById('admin-hero-headline').value = siteData.heroHeadline;
+            document.getElementById('admin-hero-subtitle').value = siteData.heroSubtitle;
+            document.getElementById('admin-estimator-base-rate').value = siteData.estimatorBaseRate ?? 120;
+            document.getElementById('admin-estimator-per-1000').value = siteData.estimatorPer1000 ?? 8;
+            document.getElementById('admin-hero-img-url').value = siteData.heroBgUrl;
+            document.getElementById('admin-before-img-url').value = siteData.beforeImageUrl;
+            document.getElementById('admin-after-img-url').value = siteData.afterImageUrl;
+            refreshImagePreviews();
+            renderServiceEditor();
+        }
+
+        function refreshImagePreviews() {
+            document.getElementById('admin-preview-hero').src = document.getElementById('admin-hero-img-url').value || '';
+            document.getElementById('admin-preview-before').src = document.getElementById('admin-before-img-url').value || '';
+            document.getElementById('admin-preview-after').src = document.getElementById('admin-after-img-url').value || '';
+        }
+
+        function syncFormToData() {
+            siteData.heroHeadline = document.getElementById('admin-hero-headline').value;
+            siteData.heroSubtitle = document.getElementById('admin-hero-subtitle').value;
+            siteData.estimatorBaseRate = Number(document.getElementById('admin-estimator-base-rate').value || 0);
+            siteData.estimatorPer1000 = Number(document.getElementById('admin-estimator-per-1000').value || 0);
+            siteData.heroBgUrl = document.getElementById('admin-hero-img-url').value;
+            siteData.beforeImageUrl = document.getElementById('admin-before-img-url').value;
+            siteData.afterImageUrl = document.getElementById('admin-after-img-url').value;
+            document.querySelectorAll('[data-service-field]').forEach((field) => {
+                const service = siteData.serviceItems[Number(field.dataset.index)];
+                if (!service) return;
+                service[field.dataset.serviceField] = field.dataset.serviceField === 'price' ? Number(field.value || 0) : field.value;
+            });
+            if (siteData.serviceItems[0]?.id === 'mowing') siteData.mowingPrice = siteData.serviceItems[0].price;
+        }
+
+        function addServiceItem() {
+            siteData.serviceItems.push({ id: `service-${Date.now()}`, title: 'New Service', description: 'Describe this service here.', price: 150, image: '' });
+            renderServiceEditor();
+            saveSiteData();
+        }
+
+        function handleImageUpload(type) {
+            const fileInput = document.getElementById(`admin-upload-${type}`);
+            const urlInput = document.getElementById(`admin-${type === 'hero' ? 'hero' : type}-img-url`);
+            const file = fileInput.files?.[0];
+            if (!file) { alert('Choose an image file first.'); return; }
+            const reader = new FileReader();
+            reader.onload = () => {
+                urlInput.value = reader.result;
+                refreshImagePreviews();
+                syncFormToData();
+                saveSiteData('Image and settings saved in this browser.');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function publishToGitHub(event) {
+            event.preventDefault();
+            syncFormToData();
+            saveSiteData();
+            const token = document.getElementById('gh-token').value.trim();
+            const owner = document.getElementById('gh-owner').value.trim();
+            const repo = document.getElementById('gh-repo').value.trim();
+            if (!token || !owner || !repo) {
+                document.getElementById('save-status').textContent = 'Settings saved locally. Add GitHub details to publish online.';
+                return;
+            }
+            const status = document.getElementById('save-status');
+            status.textContent = 'Publishing settings to GitHub...';
+            try {
+                const path = 'site-data.json';
+                const headers = { Authorization: `token ${token}`, 'Content-Type': 'application/json' };
+                const endpoint = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path}`;
+                const existing = await fetch(endpoint, { headers });
+                let sha;
+                if (existing.ok) sha = (await existing.json()).sha;
+                const bytes = new TextEncoder().encode(JSON.stringify(siteData, null, 2));
+                let binary = '';
+                for (const byte of bytes) binary += String.fromCharCode(byte);
+                const response = await fetch(endpoint, {
+                    method: 'PUT', headers,
+                    body: JSON.stringify({ message: 'Admin Update: Site Settings', content: btoa(binary), ...(sha ? { sha } : {}) })
+                });
+                if (!response.ok) throw new Error('GitHub rejected the update. Check repository access and token permissions.');
+                status.textContent = 'Settings saved locally and published to GitHub.';
+            } catch (error) {
+                status.textContent = `Saved locally, but GitHub publishing failed: ${error.message}`;
+            }
+        }
+
+        document.getElementById('admin-form').addEventListener('input', (event) => {
+            if (event.target.matches('[data-service-field]')) {
+                syncFormToData();
+                saveSiteData();
+            }
+            if (event.target.matches('#admin-hero-img-url, #admin-before-img-url, #admin-after-img-url')) refreshImagePreviews();
+        });
+
+        document.getElementById('admin-form').addEventListener('change', (event) => {
+            const upload = event.target.closest('[data-service-upload]');
+            if (upload?.files?.[0]) {
+                const service = siteData.serviceItems[Number(upload.dataset.serviceUpload)];
+                const reader = new FileReader();
+                reader.onload = () => {
+                    service.image = reader.result;
+                    const imageUrl = document.querySelector(`[data-service-field="image"][data-index="${upload.dataset.serviceUpload}"]`);
+                    imageUrl.value = service.image;
+                    saveSiteData('Service image saved in this browser.');
+                };
+                reader.readAsDataURL(upload.files[0]);
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            const removeButton = event.target.closest('[data-remove-service]');
+            if (!removeButton) return;
+            siteData.serviceItems.splice(Number(removeButton.dataset.removeService), 1);
+            renderServiceEditor();
+            saveSiteData();
+        });
+
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) siteData = { ...siteData, ...JSON.parse(saved) };
+        } catch (error) {
+            document.getElementById('save-status').textContent = 'Saved settings could not be read; defaults are shown.';
+        }
+        if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = [...defaultSiteData.serviceItems];
+        populateAdminFields();
+    </script>
+</body>
+</html>

@@ -232,8 +232,8 @@ const server = http.createServer(async (request, response) => {
         return sendJson(response, 405, { error: 'Method not allowed.' });
     }
 
-    const page = requestUrl.pathname === '/' ? 'landscaping_fullstack_application.html' : requestUrl.pathname.slice(1);
-    if (!['landscaping_fullstack_application.html', 'admin.html'].includes(page)) {
+    const page = requestUrl.pathname === '/' ? 'index.html' : requestUrl.pathname.slice(1);
+    if (!['index.html', 'admin.html'].includes(page)) {
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         return response.end('Not found');
     }

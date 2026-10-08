@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Admin | Aspen Leaf Scape Ltd</title>
+    <script>if (location.protocol === 'file:') location.replace('http://localhost:3000/admin.html');</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -44,10 +45,12 @@
                 </div>
             </div>
             <a href="landscaping_fullstack_application.html" class="px-4 py-2 rounded-lg border border-white/30 hover:bg-white/10 text-sm font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Back to Home</a>
+            <button type="button" onclick="logoutAdmin()" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-semibold"><i class="fa-solid fa-right-from-bracket mr-2"></i>Sign out</button>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+    <p id="admin-auth-message" class="hidden max-w-2xl mx-auto m-6 rounded-xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">Admin access requires the password-protected Node site. Open this page through the running site server.</p>
+    <main id="admin-app" class="hidden max-w-6xl mx-auto px-4 py-8 sm:py-10">
         <form id="admin-form" class="space-y-6" onsubmit="publishToGitHub(event)">
             <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
                 <div class="flex items-start gap-3">
@@ -97,6 +100,28 @@
     </main>
 
     <script>
+        async function verifyAdminSession() {
+            try {
+                const response = await fetch('/api/admin/session', { cache: 'no-store' });
+                if (response.ok) {
+                    document.getElementById('admin-app').classList.remove('hidden');
+                    return;
+                }
+                if (response.status === 401) {
+                    window.location.replace('/admin.html');
+                    return;
+                }
+                document.getElementById('admin-auth-message').classList.remove('hidden');
+            } catch (error) {
+                document.getElementById('admin-auth-message').classList.remove('hidden');
+            }
+        }
+
+        async function logoutAdmin() {
+            await fetch('/api/admin/logout', { method: 'POST' });
+            window.location.assign('/admin.html');
+        }
+
         const STORAGE_KEY = 'verdant-edge-site-data-v2';
         const defaultSiteData = {
             heroHeadline: 'Transforming Lawns into Living Masterpieces',
@@ -273,6 +298,7 @@
         }
         if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = [...defaultSiteData.serviceItems];
         populateAdminFields();
+        verifyAdminSession();
     </script>
 </body>
 </html>

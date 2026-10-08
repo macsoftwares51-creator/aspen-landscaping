@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -19,6 +20,8 @@ const port = Number(process.env.PORT || 3000);
 const githubApi = 'https://api.github.com';
 const reviewPath = 'reviews.json';
 const reviewRateLimits = new Map();
+const loginRateLimits = new Map();
+const adminCookieName = 'aspen_admin_session';
 
 function sendJson(response, status, payload) {
     response.writeHead(status, {
@@ -27,6 +30,64 @@ function sendJson(response, status, payload) {
         'X-Content-Type-Options': 'nosniff'
     });
     response.end(JSON.stringify(payload));
+}
+
+function hasAdminConfig() {
+    return Boolean(process.env.ADMIN_PASSWORD && process.env.ADMIN_SESSION_SECRET);
+}
+
+function createAdminSession() {
+    const payload = Buffer.from(JSON.stringify({ expiresAt: Date.now() + 8 * 60 * 60 * 1000 })).toString('base64url');
+    const signature = createHmac('sha256', process.env.ADMIN_SESSION_SECRET).update(payload).digest('base64url');
+    return `${payload}.${signature}`;
+}
+
+function isAdminAuthenticated(request) {
+    if (!hasAdminConfig()) return false;
+    const cookies = Object.fromEntries((request.headers.cookie || '').split(';').map((part) => {
+        const separator = part.indexOf('=');
+        return separator < 0 ? ['', ''] : [part.slice(0, separator).trim(), part.slice(separator + 1).trim()];
+    }));
+    const [payload, suppliedSignature, extra] = (cookies[adminCookieName] || '').split('.');
+    if (!payload || !suppliedSignature || extra) return false;
+    const expectedSignature = createHmac('sha256', process.env.ADMIN_SESSION_SECRET).update(payload).digest();
+    const actualSignature = Buffer.from(suppliedSignature, 'base64url');
+    if (actualSignature.length !== expectedSignature.length || !timingSafeEqual(actualSignature, expectedSignature)) return false;
+    try {
+        return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')).expiresAt > Date.now();
+    } catch {
+        return false;
+    }
+}
+
+function loginPage() {
+    const setupMessage = hasAdminConfig()
+        ? ''
+        : '<p class="warning">Admin access is not configured. Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET on the server.</p>';
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Login | Aspen Leaf Scape Ltd</title><style>
+        *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f5ef;color:#1f2937;font:16px system-ui,sans-serif;padding:20px}.panel{width:min(100%,420px);background:#fff;border:1px solid #dfe7e1;border-top:5px solid #1e3a2b;border-radius:16px;padding:28px;box-shadow:0 20px 50px #0f172a20}h1{font-size:22px;color:#1e3a2b;margin:0 0 8px}p{font-size:14px;color:#64748b}label{display:block;font-size:13px;font-weight:700;margin:22px 0 6px}input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}button{width:100%;margin-top:16px;padding:12px;background:#1e3a2b;color:#fff;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer}button:disabled{opacity:.6}.status{min-height:20px;color:#9f1239}.warning{background:#fff7ed;color:#9a3412;padding:10px;border-radius:8px}
+        </style></head><body><main class="panel"><h1>Aspen Leaf Scape Ltd</h1><p>Sign in to site administration.</p>${setupMessage}<form id="login-form"><label for="password">Admin password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button><p class="status" id="status" role="status"></p></form><a href="/" style="font-size:13px;color:#1e3a2b">Back to home</a></main><script>
+        document.getElementById('login-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.currentTarget.querySelector('button');const status=document.getElementById('status');button.disabled=true;status.textContent='Signing in...';try{const response=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:document.getElementById('password').value})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Sign in failed.');location.assign('/admin.html')}catch(error){status.textContent=error.message}finally{button.disabled=false}});
+        </script></body></html>`;
+}
+
+function sendAdminCookie(response, request, token) {
+    const secure = process.env.NODE_ENV === 'production' || request.socket.encrypted;
+    const attributes = `Path=/; HttpOnly; SameSite=Strict; Max-Age=${token ? 28800 : 0}${secure ? '; Secure' : ''}`;
+    response.setHeader('Set-Cookie', `${adminCookieName}=${token || ''}; ${attributes}`);
+}
+
+function adminLoginRateLimited(request) {
+    const address = request.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const windowMs = 15 * 60 * 1000;
+    const entry = loginRateLimits.get(address);
+    if (!entry || now - entry.startedAt >= windowMs) {
+        loginRateLimits.set(address, { startedAt: now, count: 1 });
+        return false;
+    }
+    entry.count += 1;
+    return entry.count > 8;
 }
 
 function hasGitHubConfig() {
@@ -104,6 +165,34 @@ async function saveReview(review) {
 const server = http.createServer(async (request, response) => {
     const requestUrl = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
 
+    if (requestUrl.pathname === '/api/admin/session' && request.method === 'GET') {
+        if (!hasAdminConfig()) return sendJson(response, 503, { error: 'Admin access is not configured.' });
+        if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
+        return sendJson(response, 200, { authenticated: true });
+    }
+
+    if (requestUrl.pathname === '/api/admin/login' && request.method === 'POST') {
+        if (!hasAdminConfig()) return sendJson(response, 503, { error: 'Admin access is not configured.' });
+        if (adminLoginRateLimited(request)) return sendJson(response, 429, { error: 'Too many sign-in attempts. Try again later.' });
+        try {
+            const body = await readRequestBody(request);
+            const candidate = Buffer.from(typeof body.password === 'string' ? body.password : '');
+            const expected = Buffer.from(process.env.ADMIN_PASSWORD);
+            const passwordMatches = candidate.length === expected.length && timingSafeEqual(candidate, expected);
+            if (!passwordMatches) return sendJson(response, 401, { error: 'Incorrect password.' });
+            const token = createAdminSession();
+            sendAdminCookie(response, request, token);
+            return sendJson(response, 200, { ok: true });
+        } catch {
+            return sendJson(response, 400, { error: 'Invalid sign-in request.' });
+        }
+    }
+
+    if (requestUrl.pathname === '/api/admin/logout' && request.method === 'POST') {
+        sendAdminCookie(response, request, '');
+        return sendJson(response, 200, { ok: true });
+    }
+
     if (requestUrl.pathname === '/api/reviews' && request.method === 'GET') {
         if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'Review service is not configured yet.' });
         try {
@@ -148,10 +237,20 @@ const server = http.createServer(async (request, response) => {
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         return response.end('Not found');
     }
+    if (page === 'admin.html' && !isAdminAuthenticated(request)) {
+        response.writeHead(200, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-store',
+            'X-Content-Type-Options': 'nosniff',
+            'Referrer-Policy': 'no-referrer'
+        });
+        return response.end(loginPage());
+    }
     try {
         const content = await readFile(path.join(root, page));
         response.writeHead(200, {
             'Content-Type': 'text/html; charset=utf-8',
+            ...(page === 'admin.html' ? { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } : {}),
             'X-Content-Type-Options': 'nosniff',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         });

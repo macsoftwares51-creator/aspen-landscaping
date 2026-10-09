@@ -715,6 +715,30 @@
         font-weight: 600;
       }
 
+      .review-section {
+        margin: 30px 0;
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .review-heading { margin-bottom: 20px; }
+      .review-heading h2 { margin: 0 0 6px; color: var(--forest); font: 600 clamp(2.1rem, 4vw, 3rem)/1 "Cormorant Garamond", serif; }
+      .review-heading p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+      .review-layout { display: grid; grid-template-columns: minmax(280px, 0.85fr) 1.15fr; gap: 22px; align-items: start; }
+      .review-list { display: grid; gap: 14px; min-width: 0; }
+      .review-card { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.58); }
+      .review-card__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .review-card__name { margin: 0; color: var(--forest); font-size: 0.95rem; }
+      .review-card__stars { color: #b67d36; white-space: nowrap; }
+      .review-card__message { margin: 12px 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap; }
+      .review-card__date { margin: 10px 0 0; color: #777; font-size: 0.72rem; }
+      .review-empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); font-size: 0.88rem; }
+      .review-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+      .review-status { min-height: 1.4em; margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+      .review-status a { color: var(--forest); text-decoration: underline; }
+      #reviewSubmit:disabled { opacity: 0.55; cursor: not-allowed; }
+
       .footer {
         background: rgba(31, 59, 45, 0.96);
         color: #edf2ee;
@@ -812,6 +836,8 @@
         .contact-wrap {
           grid-template-columns: 1fr;
         }
+
+        .review-layout { grid-template-columns: 1fr; }
       }
 
       @media (max-width: 760px) {
@@ -886,7 +912,9 @@
           <a href="#mission">Mission</a>
           <a href="#services">Services</a>
           <a href="#projects">Projects</a>
+          <a href="#reviews">Reviews</a>
           <a href="#quote">Quote</a>
+          <a href="admin.html">Admin</a>
           <a href="#contact" class="donate">Book Now</a>
         </nav>
       </header>
@@ -1022,6 +1050,35 @@
           </div>
         </section>
 
+        <section class="review-section" id="reviews" aria-labelledby="reviewsHeading">
+          <div class="review-heading">
+            <h2 id="reviewsHeading">Customer Reviews</h2>
+            <p>Read feedback shared by Aspen Leaf Scape customers, or tell us about your experience.</p>
+          </div>
+          <div class="review-layout">
+            <div class="form-card">
+              <form class="contact-form" id="reviewForm">
+                <input type="text" name="name" placeholder="Your name" minlength="2" maxlength="60" autocomplete="name" required />
+                <select name="rating" required>
+                  <option value="">Select a rating</option>
+                  <option value="5">5 stars</option>
+                  <option value="4">4 stars</option>
+                  <option value="3">3 stars</option>
+                  <option value="2">2 stars</option>
+                  <option value="1">1 star</option>
+                </select>
+                <textarea name="message" placeholder="Tell us about your experience" minlength="10" maxlength="1200" required></textarea>
+                <label class="review-honeypot" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1" autocomplete="off" /></label>
+                <button type="submit" id="reviewSubmit" disabled>Submit Review</button>
+                <p class="review-status" id="reviewStatus" role="status" aria-live="polite">Loading reviews...</p>
+              </form>
+            </div>
+            <div class="review-list" id="reviewList" aria-live="polite">
+              <p class="review-empty">Loading reviews...</p>
+            </div>
+          </div>
+        </section>
+
         <section class="contact-wrap" id="contact">
           <div class="contact-card">
             <h2>Make your outdoor space feel like home.</h2>
@@ -1087,6 +1144,8 @@
             <a href="#mission">Mission</a>
             <a href="#services">Services</a>
             <a href="#projects">Projects</a>
+            <a href="#reviews">Reviews</a>
+            <a href="admin.html">Site admin</a>
           </div>
 
           <div class="footer-col">
@@ -1311,6 +1370,83 @@
       areaRange.addEventListener('input', updateEstimate);
       services.forEach((box) => box.addEventListener('change', updateEstimate));
       updateEstimate();
+
+      const reviewForm = document.getElementById('reviewForm');
+      const reviewList = document.getElementById('reviewList');
+      const reviewStatus = document.getElementById('reviewStatus');
+      const reviewSubmit = document.getElementById('reviewSubmit');
+      let reviewApiAvailable = false;
+
+      function renderReviews(reviews) {
+        if (!reviews.length) {
+          reviewList.innerHTML = '<p class="review-empty">No reviews yet. Be the first to share your experience.</p>';
+          return;
+        }
+
+        reviewList.innerHTML = reviews.map((review) => {
+          const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
+          const date = new Date(review.createdAt);
+          const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
+          return `<article class="review-card">
+            <div class="review-card__header">
+              <h3 class="review-card__name">${escapeHtml(review.name || 'Customer')}</h3>
+              <span class="review-card__stars" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>
+            </div>
+            <p class="review-card__message">${escapeHtml(review.message || '')}</p>
+            ${dateLabel ? `<p class="review-card__date">${dateLabel}</p>` : ''}
+          </article>`;
+        }).join('');
+      }
+
+      async function loadReviews() {
+        try {
+          const response = await fetch(new URL('api/reviews', siteBaseUrl), { cache: 'no-store' });
+          if (!response.ok) throw new Error('Review API unavailable.');
+          const data = await response.json();
+          reviewApiAvailable = true;
+          reviewSubmit.disabled = false;
+          reviewStatus.textContent = 'Your name and review will be publicly visible.';
+          renderReviews(Array.isArray(data.reviews) ? data.reviews : []);
+        } catch (error) {
+          try {
+            const response = await fetch(new URL('reviews.json', siteBaseUrl), { cache: 'no-store' });
+            if (!response.ok) throw new Error('Static reviews unavailable.');
+            const reviews = await response.json();
+            renderReviews(Array.isArray(reviews) ? reviews : []);
+          } catch (fallbackError) {
+            renderReviews([]);
+          }
+          reviewSubmit.disabled = true;
+          reviewStatus.innerHTML = 'Review submission is unavailable on this static host. <a href="https://wa.me/254743313867?text=I%20would%20like%20to%20share%20a%20review%20for%20Aspen%20Leaf%20Scape">Contact us on WhatsApp</a>.';
+        }
+      }
+
+      reviewForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!reviewApiAvailable) return;
+        const payload = Object.fromEntries(new FormData(reviewForm).entries());
+        payload.rating = Number(payload.rating);
+        reviewSubmit.disabled = true;
+        reviewStatus.textContent = 'Submitting your review...';
+        try {
+          const response = await fetch(new URL('api/reviews', siteBaseUrl), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Your review could not be submitted.');
+          reviewForm.reset();
+          reviewStatus.textContent = 'Thank you. Your review has been submitted.';
+          await loadReviews();
+        } catch (error) {
+          reviewStatus.textContent = `${error.message} Please try again later.`;
+        } finally {
+          reviewSubmit.disabled = !reviewApiAvailable;
+        }
+      });
+
+      loadReviews();
 
       const menuToggle = document.querySelector('.menu-toggle');
       const nav = document.getElementById('siteNav');

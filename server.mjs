@@ -263,7 +263,8 @@ const server = http.createServer(async (request, response) => {
         'assets/aspen-leaf-logo-hero.png',
     ]);
     const servicePicture = /^pictures\/[A-Za-z0-9 _-]+\/[A-Za-z0-9._-]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(page);
-    if (!['index.html', 'admin.html'].includes(page) && !imageAssets.has(page) && !servicePicture) {
+    const serviceImageManifest = page === 'pictures/service-images.json';
+    if (!['index.html', 'admin.html'].includes(page) && !imageAssets.has(page) && !servicePicture && !serviceImageManifest) {
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         return response.end('Not found');
     }
@@ -280,7 +281,7 @@ const server = http.createServer(async (request, response) => {
         const content = await readFile(path.join(root, page));
         const extension = path.extname(page).toLowerCase();
         response.writeHead(200, {
-            'Content-Type': extension === '.png' ? 'image/png' : extension === '.webp' ? 'image/webp' : extension === '.avif' ? 'image/avif' : extension === '.gif' ? 'image/gif' : imageAssets.has(page) || servicePicture ? 'image/jpeg' : 'text/html; charset=utf-8',
+            'Content-Type': serviceImageManifest ? 'application/json; charset=utf-8' : extension === '.png' ? 'image/png' : extension === '.webp' ? 'image/webp' : extension === '.avif' ? 'image/avif' : extension === '.gif' ? 'image/gif' : imageAssets.has(page) || servicePicture ? 'image/jpeg' : 'text/html; charset=utf-8',
             ...(page === 'admin.html' ? { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } : {}),
             'X-Content-Type-Options': 'nosniff',
             'Referrer-Policy': 'strict-origin-when-cross-origin'

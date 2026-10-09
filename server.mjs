@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -228,12 +228,42 @@ const server = http.createServer(async (request, response) => {
         }
     }
 
+    if (requestUrl.pathname === '/api/service-images' && request.method === 'GET') {
+        try {
+            const pictureRoot = path.join(root, 'pictures');
+            const folderEntries = await readdir(pictureRoot, { withFileTypes: true });
+            const folders = {};
+            for (const folder of folderEntries.filter((entry) => entry.isDirectory())) {
+                const files = await readdir(path.join(pictureRoot, folder.name), { withFileTypes: true });
+                folders[folder.name] = files
+                    .filter((file) => file.isFile() && /\.(?:avif|gif|jpe?g|png|webp)$/i.test(file.name))
+                    .map((file) => `/pictures/${encodeURIComponent(folder.name)}/${encodeURIComponent(file.name)}`)
+                    .sort();
+            }
+            return sendJson(response, 200, { folders });
+        } catch (error) {
+            console.error(error);
+            return sendJson(response, 500, { error: 'Could not load service pictures.' });
+        }
+    }
+
     if (request.method !== 'GET' && request.method !== 'HEAD') {
         return sendJson(response, 405, { error: 'Method not allowed.' });
     }
 
-    const page = requestUrl.pathname === '/' ? 'index.html' : requestUrl.pathname.slice(1);
-    if (!['index.html', 'admin.html'].includes(page)) {
+    let page;
+    try {
+        page = requestUrl.pathname === '/' ? 'index.html' : decodeURIComponent(requestUrl.pathname.slice(1));
+    } catch {
+        response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+        return response.end('Invalid path');
+    }
+    const imageAssets = new Set([
+        'assets/aspen-leaf-logo.jpeg',
+        'assets/aspen-leaf-logo-hero.png',
+    ]);
+    const servicePicture = /^pictures\/[A-Za-z0-9 _-]+\/[A-Za-z0-9._-]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(page);
+    if (!['index.html', 'admin.html'].includes(page) && !imageAssets.has(page) && !servicePicture) {
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         return response.end('Not found');
     }
@@ -248,8 +278,9 @@ const server = http.createServer(async (request, response) => {
     }
     try {
         const content = await readFile(path.join(root, page));
+        const extension = path.extname(page).toLowerCase();
         response.writeHead(200, {
-            'Content-Type': 'text/html; charset=utf-8',
+            'Content-Type': extension === '.png' ? 'image/png' : extension === '.webp' ? 'image/webp' : extension === '.avif' ? 'image/avif' : extension === '.gif' ? 'image/gif' : imageAssets.has(page) || servicePicture ? 'image/jpeg' : 'text/html; charset=utf-8',
             ...(page === 'admin.html' ? { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } : {}),
             'X-Content-Type-Options': 'nosniff',
             'Referrer-Policy': 'strict-origin-when-cross-origin'

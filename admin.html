@@ -131,13 +131,16 @@
             designPrice: '350',
             estimatorBaseRate: 120,
             estimatorPer1000: 8,
+            catalogVersion: 1,
             heroBgUrl: 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80',
             beforeImageUrl: 'https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80',
             afterImageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80',
             serviceItems: [
-                { id: 'mowing', title: 'Lawn Care & Maintenance', description: 'Precision mowing, edging, fertilization, weed control, and seasonal aeration.', price: 45, image: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=800&q=80' },
-                { id: 'hardscape', title: 'Hardscaping & Pavers', description: 'Custom patio installation, retaining walls, stone walkways, and fire pits.', price: 1200, image: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80' },
-                { id: 'design', title: 'Garden Design & Planting', description: 'Native plant selection, mulch beds, flower installation, and shrub sculpting.', price: 350, image: 'https://images.unsplash.com/photo-1557429287-b2e26467fc2b?auto=format&fit=crop&w=800&q=80' }
+                { id: 'arabic-grass', title: 'Arabic Grass Installation', description: 'Fresh, even lawns with quality grass supply and careful installation.', price: 0, image: '', beforeImage: '', afterImage: '' },
+                { id: 'kabro-installation', title: 'Kabro Installation', description: 'Durable patterned paving for driveways, walkways, and outdoor areas.', price: 0, image: '', beforeImage: '', afterImage: '' },
+                { id: 'garden-maintenance', title: 'Garden Maintenance', description: 'Reliable pruning, lawn care, weeding, and seasonal garden upkeep.', price: 0, image: '', beforeImage: '', afterImage: '' },
+                { id: 'mazeras-installation', title: 'Mazeras Installation', description: 'Natural stone finishes for paths, patios, steps, and garden features.', price: 0, image: '', beforeImage: '', afterImage: '' },
+                { id: 'landscape-design', title: 'Landscape Design', description: 'A considered plan for planting, paving, lawns, and outdoor living.', price: 0, image: '', beforeImage: '', afterImage: '' }
             ]
         };
         let siteData = structuredClone(defaultSiteData);
@@ -163,9 +166,12 @@
                         <label class="text-[10px] uppercase font-bold text-gray-600">Service title<input data-service-field="title" data-index="${index}" value="${escapeHtml(service.title)}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case"></label>
                         <label class="text-[10px] uppercase font-bold text-gray-600">Price (Kshs)<input data-service-field="price" data-index="${index}" type="number" min="0" step="1" value="${Number(service.price || 0)}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case"></label>
                     </div>
-                    <label class="block text-[10px] uppercase font-bold text-gray-600">Service image URL<input data-service-field="image" data-index="${index}" value="${escapeHtml(service.image || '')}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case" placeholder="https://example.com/image.jpg"></label>
-                    <label class="block text-[10px] uppercase font-bold text-gray-600">Upload service image<input data-service-upload="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs normal-case"></label>
                     <label class="block text-[10px] uppercase font-bold text-gray-600">Description<textarea data-service-field="description" data-index="${index}" rows="2" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case">${escapeHtml(service.description || '')}</textarea></label>
+                    <div class="grid sm:grid-cols-3 gap-3">
+                        <div><p class="text-[10px] uppercase font-bold text-gray-600">Service photo</p><img data-service-preview="image" data-index="${index}" src="${escapeHtml(service.image || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="Service photo preview"><input data-service-field="image" data-index="${index}" value="${escapeHtml(service.image || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="image" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
+                        <div><p class="text-[10px] uppercase font-bold text-gray-600">Before photo</p><img data-service-preview="beforeImage" data-index="${index}" src="${escapeHtml(service.beforeImage || siteData.beforeImageUrl || '')}" class="admin-thumb my-1" alt="Before photo preview"><input data-service-field="beforeImage" data-index="${index}" value="${escapeHtml(service.beforeImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Uses default before photo"><input data-service-upload="beforeImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
+                        <div><p class="text-[10px] uppercase font-bold text-gray-600">After photo</p><img data-service-preview="afterImage" data-index="${index}" src="${escapeHtml(service.afterImage || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="After photo preview"><input data-service-field="afterImage" data-index="${index}" value="${escapeHtml(service.afterImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Uses default after photo"><input data-service-upload="afterImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
+                    </div>
                     <div class="flex justify-end"><button type="button" data-remove-service="${index}" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-bold"><i class="fa-solid fa-trash mr-1"></i>Remove service</button></div>
                 </article>`).join('') : '<p class="rounded-lg border border-dashed p-4 text-sm text-gray-500">No services yet. Add a service to get started.</p>';
         }
@@ -205,7 +211,7 @@
         }
 
         function addServiceItem() {
-            siteData.serviceItems.push({ id: `service-${Date.now()}`, title: 'New Service', description: 'Describe this service here.', price: 150, image: '' });
+            siteData.serviceItems.push({ id: `service-${Date.now()}`, title: 'New Service', description: 'Describe this service here.', price: 0, image: '', beforeImage: '', afterImage: '' });
             renderServiceEditor();
             saveSiteData();
         }
@@ -261,8 +267,14 @@
 
         document.getElementById('admin-form').addEventListener('input', (event) => {
             if (event.target.matches('[data-service-field]')) {
+                const field = event.target;
                 syncFormToData();
                 saveSiteData();
+                const preview = document.querySelector(`[data-service-preview="${field.dataset.serviceField}"][data-index="${field.dataset.index}"]`);
+                const service = siteData.serviceItems[Number(field.dataset.index)];
+                if (preview && service) {
+                    preview.src = field.value || (field.dataset.serviceField === 'beforeImage' ? siteData.beforeImageUrl : field.dataset.serviceField === 'afterImage' ? siteData.afterImageUrl : '');
+                }
             }
             if (event.target.matches('#admin-hero-img-url, #admin-before-img-url, #admin-after-img-url')) refreshImagePreviews();
         });
@@ -270,12 +282,16 @@
         document.getElementById('admin-form').addEventListener('change', (event) => {
             const upload = event.target.closest('[data-service-upload]');
             if (upload?.files?.[0]) {
-                const service = siteData.serviceItems[Number(upload.dataset.serviceUpload)];
+                const index = Number(upload.dataset.index);
+                const fieldName = upload.dataset.serviceUpload;
+                const service = siteData.serviceItems[index];
                 const reader = new FileReader();
                 reader.onload = () => {
-                    service.image = reader.result;
-                    const imageUrl = document.querySelector(`[data-service-field="image"][data-index="${upload.dataset.serviceUpload}"]`);
-                    imageUrl.value = service.image;
+                    const imageField = document.querySelector(`[data-service-field="${fieldName}"][data-index="${index}"]`);
+                    imageField.value = reader.result;
+                    syncFormToData();
+                    const preview = document.querySelector(`[data-service-preview="${fieldName}"][data-index="${index}"]`);
+                    if (preview) preview.src = reader.result;
                     saveSiteData('Service image saved in this browser.');
                 };
                 reader.readAsDataURL(upload.files[0]);
@@ -290,13 +306,25 @@
             saveSiteData();
         });
 
+        let savedSiteData = null;
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) siteData = { ...siteData, ...JSON.parse(saved) };
+            if (saved) {
+                savedSiteData = JSON.parse(saved);
+                siteData = { ...siteData, ...savedSiteData };
+            }
         } catch (error) {
             document.getElementById('save-status').textContent = 'Saved settings could not be read; defaults are shown.';
         }
         if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = [...defaultSiteData.serviceItems];
+        if (savedSiteData && Number(savedSiteData.catalogVersion || 0) < 1) {
+            if (siteData.serviceItems.length) {
+                const serviceIds = new Set(siteData.serviceItems.map((service) => service.id));
+                siteData.serviceItems.push(...defaultSiteData.serviceItems.filter((service) => !serviceIds.has(service.id)).map((service) => ({ ...service })));
+            }
+            siteData.catalogVersion = 1;
+            saveSiteData('New landscaping services added. Review the catalog before publishing.');
+        }
         populateAdminFields();
         verifyAdminSession();
     </script>

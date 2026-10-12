@@ -228,13 +228,11 @@ const server = http.createServer(async (request, response) => {
         }
     }
 
-    if (requestUrl.pathname === '/api/admin/settings' && request.method === 'POST') {
+   if (requestUrl.pathname === '/api/admin/settings' && request.method === 'POST') {
         if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
         if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'GitHub config missing on server.' });
         try {
             const body = await readRequestBody(request);
-            
-            // Re-using your GitHub publishing logic here:
             const settingsPath = 'site-data.json';
             const owner = encodeURIComponent(process.env.GITHUB_OWNER);
             const repo = encodeURIComponent(process.env.GITHUB_REPO);
@@ -246,6 +244,9 @@ const server = http.createServer(async (request, response) => {
             if (existing.ok) {
                 const fileData = await existing.json();
                 sha = fileData.sha;
+            } else if (existing.status !== 404) {
+                const errText = await existing.text();
+                console.error('GitHub check failed:', existing.status, errText);
             }
 
             const content = Buffer.from(JSON.stringify(body, null, 2)).toString('base64');
@@ -259,12 +260,16 @@ const server = http.createServer(async (request, response) => {
                 })
             });
 
-            if (!responsePayload.ok) throw new Error(`GitHub write failed (${responsePayload.status}).`);
+            if (!responsePayload.ok) {
+                const errorDetails = await responsePayload.text();
+                console.error('GitHub write error response:', errorDetails);
+                throw new Error(`GitHub write failed (${responsePayload.status}).`);
+            }
 
             return sendJson(response, 200, { ok: true });
         } catch (error) {
-            console.error(error);
-            return sendJson(response, 502, { error: 'Could not publish to GitHub.' });
+            console.error('Settings publish error:', error);
+            return sendJson(response, 502, { error: error.message || 'Could not publish to GitHub.' });
         }
     }
     

@@ -4,6 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { v2 as cloudinary } from 'cloudinary';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,6 +15,15 @@ if (existsSync(path.join(root, '.env'))) {
             process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2');
         }
     }
+}
+
+// Configure Cloudinary if keys are present
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
 }
 
 const port = Number(process.env.PORT || 3000);
@@ -140,6 +150,15 @@ async function readRequestBody(request) {
     return JSON.parse(body || '{}');
 }
 
+async function readLargeRequestBody(request) {
+    let body = '';
+    for await (const chunk of request) {
+        body += chunk;
+        if (body.length > 2 * 1024 * 1024) throw new Error('Settings payload is too large.');
+    }
+    return JSON.parse(body || '{}');
+}
+
 async function saveReview(review) {
     for (let attempt = 0; attempt < 3; attempt += 1) {
         const current = await readReviews();
@@ -193,6 +212,37 @@ const server = http.createServer(async (request, response) => {
         return sendJson(response, 200, { ok: true });
     }
 
+    // Cloudinary Image Upload Route for Admin
+    if (requestUrl.pathname === '/api/admin/upload' && request.method === 'POST') {
+        if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
+        if (!process.env.CLOUDINARY_CLOUD_NAME) return sendJson(response, 503, { error: 'Cloudinary is not configured on the server.' });
+        
+        try {
+            const chunks = [];
+            for await (const chunk of request) {
+                chunks.push(chunk);
+            }
+            const buffer = Buffer.concat(chunks);
+            
+            // Upload buffer directly to Cloudinary using upload_stream
+            const uploadResult = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: 'aspen-landscaping' },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                uploadStream.end(buffer);
+            });
+
+            return sendJson(response, 200, { url: uploadResult.secure_url });
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            return sendJson(response, 500, { error: 'Failed to upload image to Cloudinary.' });
+        }
+    }
+
     if (requestUrl.pathname === '/api/reviews' && request.method === 'GET') {
         if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'Review service is not configured yet.' });
         try {
@@ -225,6 +275,50 @@ const server = http.createServer(async (request, response) => {
             }
             console.error(error);
             return sendJson(response, 502, { error: 'Could not save your review to GitHub. Please try again later.' });
+        }
+    }
+
+    if (requestUrl.pathname === '/api/admin/settings' && request.method === 'POST') {
+        if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
+        if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'GitHub config missing on server.' });
+        try {
+            const body = await readLargeRequestBody(request);
+            const settingsPath = 'site-data.json';
+            const owner = encodeURIComponent(process.env.GITHUB_OWNER);
+            const repo = encodeURIComponent(process.env.GITHUB_REPO);
+            const endpoint = `${githubApi}/repos/${owner}/${repo}/contents/${settingsPath}`;
+            
+            const existing = await fetch(endpoint, { headers: githubHeaders() });
+            let sha = null;
+            if (existing.ok) {
+                const fileData = await existing.json();
+                sha = fileData.sha;
+            } else if (existing.status !== 404) {
+                const errText = await existing.text();
+                console.error('GitHub check failed:', existing.status, errText);
+            }
+
+            const content = Buffer.from(JSON.stringify(body, null, 2)).toString('base64');
+            const responsePayload = await fetch(endpoint, {
+                method: 'PUT',
+                headers: { ...githubHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: 'Admin Update: Site Settings & Pictures',
+                    content,
+                    ...(sha ? { sha } : {})
+                })
+            });
+
+            if (!responsePayload.ok) {
+                const errorDetails = await responsePayload.text();
+                console.error('GitHub write error response:', errorDetails);
+                throw new Error(`GitHub write failed (${responsePayload.status}).`);
+            }
+
+            return sendJson(response, 200, { ok: true });
+        } catch (error) {
+            console.error('Settings publish error:', error);
+            return sendJson(response, 502, { error: error.message || 'Could not publish to GitHub.' });
         }
     }
 

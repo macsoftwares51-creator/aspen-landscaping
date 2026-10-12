@@ -455,10 +455,11 @@
       }
 
       .comparison-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #comparisonBefore { z-index: 1; }
       .comparison-after { clip-path: inset(0 50% 0 0); }
-      .comparison-label { position: absolute; top: 12px; z-index: 1; padding: 6px 10px; border-radius: 999px; background: rgba(20,36,28,0.78); color: white; font-size: 0.75rem; font-weight: 700; }
+      .comparison-label { position: absolute; top: 12px; z-index: 2; box-sizing: border-box; width: 0; min-width: 0; overflow: hidden; white-space: nowrap; padding: 6px 10px; border-radius: 999px; background: rgba(20,36,28,0.78); color: white; font-size: 0.75rem; font-weight: 700; transition: width 120ms ease; }
       .comparison-label.before { left: 12px; }
-      .comparison-label.after { right: 12px; }
+      .comparison-label.after { right: 12px; text-align: right; }
 
       .comparison-controls {
         display: grid;
@@ -985,8 +986,8 @@
             <div class="comparison-stage">
               <img class="comparison-image" id="comparisonBefore" alt="Before landscaping work" />
               <img class="comparison-image comparison-after" id="comparisonAfter" alt="After landscaping work" />
-              <span class="comparison-label before">Before</span>
-              <span class="comparison-label after">After</span>
+              <span class="comparison-label before" id="comparisonBeforeLabel">Before</span>
+              <span class="comparison-label after" id="comparisonAfterLabel">After</span>
             </div>
             <div class="comparison-controls">
               <span>Before</span>
@@ -1563,11 +1564,22 @@
       });
 
       const serviceDialog = document.getElementById('serviceDialog');
+      const comparisonBefore = document.getElementById('comparisonBefore');
       const comparisonAfter = document.getElementById('comparisonAfter');
       const comparisonRange = document.getElementById('comparisonRange');
+      const comparisonBeforeLabel = document.getElementById('comparisonBeforeLabel');
+      const comparisonAfterLabel = document.getElementById('comparisonAfterLabel');
 
       function updateComparison() {
-        comparisonAfter.style.clipPath = `inset(0 ${100 - Number(comparisonRange.value)}% 0 0)`;
+        const beforePercent = 100 - Number(comparisonRange.value);
+        const afterPercent = 100 - beforePercent;
+        comparisonBefore.style.clipPath = `inset(0 ${afterPercent}% 0 0)`;
+
+        // Keep each label inside the image area it describes so the tabs
+        // shrink with the slider instead of covering the other image.
+        const stageWidth = comparisonAfter.parentElement.getBoundingClientRect().width;
+        comparisonBeforeLabel.style.width = `${Math.max(0, stageWidth * beforePercent / 100 - 24)}px`;
+        comparisonAfterLabel.style.width = `${Math.max(0, stageWidth * afterPercent / 100 - 24)}px`;
       }
 
       serviceCards.addEventListener('click', (event) => {
@@ -1589,7 +1601,7 @@
         const fallback = service.image || siteData.afterImageUrl || '';
         document.getElementById('dialogServiceTitle').textContent = title;
         document.getElementById('dialogServiceDescription').textContent = service.description || '';
-        document.getElementById('comparisonBefore').src = service.beforeImage || siteData.beforeImageUrl || fallback;
+        comparisonBefore.src = service.beforeImage || siteData.beforeImageUrl || fallback;
         comparisonAfter.src = service.afterImage || siteData.afterImageUrl || fallback;
         document.getElementById('dialogServicePrice').textContent = Number(service.price) > 0 ? `From KSh ${formatMoney(service.price)}` : 'Pricing on request';
         document.getElementById('dialogBookLink').href = whatsappLink(`Hello Aspen Leaf Scape, I would like to book ${title}.`);
@@ -1599,6 +1611,7 @@
       });
 
       comparisonRange.addEventListener('input', updateComparison);
+      window.addEventListener('resize', updateComparison);
       document.getElementById('closeServiceDialog').addEventListener('click', () => serviceDialog.close());
       serviceDialog.addEventListener('click', (event) => {
         if (event.target === serviceDialog) serviceDialog.close();

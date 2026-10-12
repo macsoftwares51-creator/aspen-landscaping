@@ -9,7 +9,7 @@ Requires Node.js 20 or newer. Copy `.env.example` to `.env`, then set:
 - `GITHUB_REPO`: the repository name
 - `ADMIN_PASSWORD`: a strong private password for the admin page
 - `ADMIN_SESSION_SECRET`: a long, random secret used to sign admin sessions
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: optional Cloudinary credentials for admin image uploads
+- `CLOUDINARY_URL` or `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: optional Cloudinary credentials for admin image uploads; use one format or the other
 - `PORT`: optional; defaults to `3000`
 
 Keep `.env` private. It is excluded from Git. Admin access is protected by a server-checked password and an eight-hour, signed, HTTP-only session cookie. Run the site with `npm start` and open `http://localhost:3000` (do not open `admin.html` directly as a file).

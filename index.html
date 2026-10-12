@@ -152,11 +152,27 @@
       }
 
       .hero {
+        --hero-background-image: none;
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
         display: grid;
         grid-template-columns: 1.05fr 1.2fr;
         gap: 18px;
         align-items: center;
         padding: 18px 20px 6px;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background-image: linear-gradient(90deg, rgba(239, 231, 220, 0.94) 0%, rgba(248, 245, 240, 0.78) 48%, rgba(239, 231, 220, 0.7) 100%), var(--hero-background-image);
+        background-size: cover;
+        background-position: center;
+        opacity: 0.72;
+        filter: saturate(0.78);
       }
 
       .hero-copy {
@@ -236,6 +252,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        background-position: center;
+        background-size: cover;
       }
 
       .leaf-bg {
@@ -1201,6 +1219,7 @@
       let serviceImageFolders = {};
       let serviceImagesLoaded = false;
       const serviceSlideIndexes = new Map();
+      let heroSlideIndex = 0;
 
       function escapeHtml(value = '') {
         return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -1232,6 +1251,28 @@
           if (matchedFolder) return serviceImageFolders[matchedFolder] || [];
         }
         return [];
+      }
+
+      function getHeroImages() {
+        const configured = Array.isArray(siteData.heroImages) ? siteData.heroImages.filter(Boolean).map(resolveServiceImageUrl) : [];
+        if (configured.length) return configured;
+        const serviceFolders = ['garden maintanance', 'landscape design'];
+        const sharedImages = serviceFolders.flatMap((folderName) => {
+          const matchedFolder = Object.keys(serviceImageFolders).find((folder) => normalizeFolderName(folder) === normalizeFolderName(folderName));
+          return matchedFolder ? serviceImageFolders[matchedFolder] || [] : [];
+        });
+        return [...new Set(sharedImages)];
+      }
+
+      function showHeroSlide(requestedIndex = 0) {
+        const images = getHeroImages();
+        const fallback = siteData.heroBgUrl || '';
+        if (!images.length) {
+          document.querySelector('.hero').style.setProperty('--hero-background-image', fallback ? `url("${String(fallback).replace(/"/g, '%22')}")` : 'none');
+          return;
+        }
+        heroSlideIndex = (requestedIndex + images.length) % images.length;
+        document.querySelector('.hero').style.setProperty('--hero-background-image', `url("${images[heroSlideIndex].replace(/"/g, '%22')}")`);
       }
 
       function getServiceSlideIndex(service, fallbackIndex) {
@@ -1343,7 +1384,7 @@
         document.getElementById('headerLogo').src = resolveServiceImageUrl(logoUrl);
         document.getElementById('footerLogo').src = resolveServiceImageUrl(logoUrl);
         document.getElementById('heroLogo').src = resolveServiceImageUrl(heroLogoUrl);
-        document.querySelector('.hero-visual').style.backgroundImage = siteData.heroBgUrl ? `url("${String(siteData.heroBgUrl).replace(/"/g, '%22')}")` : '';
+        showHeroSlide(0);
         document.getElementById('contactHeading').textContent = contact.heading || '';
         document.getElementById('contactLocation').textContent = contact.location || '';
         document.getElementById('contactHours').textContent = contact.hours || '';
@@ -1379,6 +1420,7 @@
           serviceImageFolders = {};
         }
         serviceImagesLoaded = true;
+        showHeroSlide(heroSlideIndex);
         renderServiceCatalog();
       }
       initializeSiteData();
@@ -1388,6 +1430,7 @@
           const images = getServiceImages(service);
           if (images.length > 1) showServiceSlide(index, getServiceSlideIndex(service, index) + 1);
         });
+        showHeroSlide(heroSlideIndex + 1);
       }, 4200);
       window.addEventListener('storage', (event) => {
         if (event.key !== siteDataStorageKey) return;

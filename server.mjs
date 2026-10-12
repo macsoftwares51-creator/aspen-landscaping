@@ -17,13 +17,27 @@ if (existsSync(path.join(root, '.env'))) {
     }
 }
 
-// Configure Cloudinary if keys are present
-if (process.env.CLOUDINARY_CLOUD_NAME) {
-    cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET
-    });
+function hasCloudinaryConfig() {
+    const connectionUrl = process.env.CLOUDINARY_URL?.trim();
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+    const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
+    const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+    return Boolean(connectionUrl || (cloudName && apiKey && apiSecret));
+}
+
+// Configure Cloudinary using either CLOUDINARY_URL or separate API credentials.
+if (hasCloudinaryConfig()) {
+    if (process.env.CLOUDINARY_URL?.trim()) {
+        process.env.CLOUDINARY_URL = process.env.CLOUDINARY_URL.trim();
+        cloudinary.config(true);
+    } else {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME.trim(),
+            api_key: process.env.CLOUDINARY_API_KEY.trim(),
+            api_secret: process.env.CLOUDINARY_API_SECRET.trim(),
+            secure: true
+        });
+    }
 }
 
 const port = Number(process.env.PORT || 3000);
@@ -244,7 +258,7 @@ const server = http.createServer(async (request, response) => {
     // Cloudinary Image Upload Route for Admin
     if (requestUrl.pathname === '/api/admin/upload' && request.method === 'POST') {
         if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
-        if (!process.env.CLOUDINARY_CLOUD_NAME) return sendJson(response, 503, { error: 'Cloudinary is not configured on the server.' });
+        if (!hasCloudinaryConfig()) return sendJson(response, 503, { error: 'Cloudinary is not configured. Set CLOUDINARY_URL or all three CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET values.' });
         if (Number(request.headers['content-length']) > maxUploadBytes) return sendJson(response, 413, { error: 'Image is too large. Maximum size is 10 MB.' });
         
         try {
@@ -256,11 +270,12 @@ const server = http.createServer(async (request, response) => {
                 chunks.push(chunk);
             }
             const buffer = Buffer.concat(chunks);
+            if (!buffer.length) return sendJson(response, 400, { error: 'No image data was received.' });
             
             // Upload buffer directly to Cloudinary using upload_stream
             const uploadResult = await new Promise((resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
-                    { folder: 'aspen-landscaping' },
+                    { folder: 'aspen-landscaping', resource_type: 'image' },
                     (error, result) => {
                         if (error) reject(error);
                         else resolve(result);
@@ -269,10 +284,12 @@ const server = http.createServer(async (request, response) => {
                 uploadStream.end(buffer);
             });
 
+            if (!uploadResult?.secure_url) throw new Error('Cloudinary did not return an image URL.');
             return sendJson(response, 200, { url: uploadResult.secure_url });
         } catch (error) {
-            console.error('Cloudinary upload error:', error);
-            return sendJson(response, 500, { error: 'Failed to upload image to Cloudinary.' });
+            const message = error?.error?.message || error?.message || 'Unknown Cloudinary error.';
+            console.error('Cloudinary upload error:', message);
+            return sendJson(response, 502, { error: `Cloudinary upload failed: ${message}` });
         }
     }
 

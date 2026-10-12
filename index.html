@@ -899,10 +899,10 @@
     <div class="page">
       <header class="topbar">
         <div class="brand" aria-label="Aspen Leaf Scape Ltd home">
-          <div class="brand-mark" aria-hidden="true"><img src="assets/aspen-leaf-logo.jpeg" alt="" /></div>
+          <div class="brand-mark" aria-hidden="true"><img id="headerLogo" src="assets/aspen-leaf-logo.jpeg" alt="" /></div>
           <div>
-            <div class="brand-name">Aspen Leaf Scape</div>
-            <div class="brand-sub">Landscaping & Design</div>
+            <div class="brand-name" id="headerBrandName">Aspen Leaf Scape</div>
+            <div class="brand-sub" id="headerBrandSubtitle">Landscaping & Design</div>
           </div>
         </div>
 
@@ -922,9 +922,9 @@
       <main>
         <section class="hero" id="mission">
           <div class="hero-copy">
-            <h1 class="headline">Transform Your Outdoor <span class="line-break">Elegantly</span></h1>
+            <h1 class="headline" id="heroHeadline">Transform Your Outdoor <span class="line-break">Elegantly</span></h1>
             <div class="headline-rule" aria-hidden="true"></div>
-            <p class="subtext">
+            <p class="subtext" id="heroSubtitle">
               Let us transform your outdoor space into a stunning haven. we help you bring your vision to life.
             </p>
 
@@ -938,7 +938,7 @@
             <div class="leaf-bg" aria-hidden="true"></div>
             <div class="orb-wrap" aria-hidden="true">
               <div class="logo-orb">
-                <img src="assets/aspen-leaf-logo-hero.png" alt="Aspen Leaf Scape Ltd. Design. Build. Beautify." />
+                <img id="heroLogo" src="assets/aspen-leaf-logo-hero.png" alt="Aspen Leaf Scape Ltd. Design. Build. Beautify." />
               </div>
             </div>
           </div>
@@ -1081,26 +1081,26 @@
 
         <section class="contact-wrap" id="contact">
           <div class="contact-card">
-            <h2>Make your outdoor space feel like home.</h2>
+            <h2 id="contactHeading">Make your outdoor space feel like home.</h2>
             <div class="contact-item">
               <div class="contact-icon">📍</div>
               <div>
                 <strong>Location</strong>
-                <span>Riverside, Nairobi • Serving homes and businesses across the city</span>
+                <span id="contactLocation">Riverside, Nairobi • Serving homes and businesses across the city</span>
               </div>
             </div>
             <div class="contact-item">
               <div class="contact-icon">⏰</div>
               <div>
                 <strong>Hours</strong>
-                <span>Mon–Sat | 8:00 AM – 6:00 PM</span>
+                <span id="contactHours">Mon–Sat | 8:00 AM – 6:00 PM</span>
               </div>
             </div>
             <div class="contact-item">
               <div class="contact-icon">📞</div>
               <div>
                 <strong>Call us</strong>
-                <a href="https://wa.me/254743313867" target="_blank" rel="noopener noreferrer">WhatsApp +254 743 313867</a>
+                <a id="contactWhatsapp" href="https://wa.me/254743313867" target="_blank" rel="noopener noreferrer">WhatsApp +254 743 313867</a>
               </div>
             </div>
           </div>
@@ -1128,10 +1128,10 @@
         <div class="footer-inner">
           <div>
             <div class="footer-brand">
-              <div class="brand-mark" aria-hidden="true"><img src="assets/aspen-leaf-logo.jpeg" alt="" /></div>
+              <div class="brand-mark" aria-hidden="true"><img id="footerLogo" src="assets/aspen-leaf-logo.jpeg" alt="" /></div>
               <div>
-                <div class="brand-name">Aspen Leaf</div>
-                <div class="brand-sub">Landscaping & Design</div>
+                <div class="brand-name" id="footerBrandName">Aspen Leaf</div>
+                <div class="brand-sub" id="footerBrandSubtitle">Landscaping & Design</div>
               </div>
             </div>
             <p class="footer-copy">
@@ -1151,16 +1151,16 @@
           <div class="footer-col">
             <h4>Stay Connected</h4>
             <div class="socials" aria-label="Social media links">
-              <a href="https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/" aria-label="Aspen Leaf Scape on Facebook" target="_blank" rel="noopener noreferrer">f</a>
+              <a id="footerFacebookIcon" href="https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/" aria-label="Aspen Leaf Scape on Facebook" target="_blank" rel="noopener noreferrer">f</a>
             </div>
           </div>
 
           <div class="footer-col">
             <h4>Contact</h4>
-            <p>aspenleafscape.com</p>
-            <p class="email">hello@aspenleafscape.com</p>
-            <a href="https://wa.me/254743313867" target="_blank" rel="noopener noreferrer">WhatsApp: +254 743 313867</a>
-            <a href="https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/" target="_blank" rel="noopener noreferrer">Facebook page</a>
+            <p id="footerWebsite">aspenleafscape.com</p>
+            <p class="email" id="footerEmail">hello@aspenleafscape.com</p>
+            <a id="footerWhatsapp" href="https://wa.me/254743313867" target="_blank" rel="noopener noreferrer">WhatsApp: +254 743 313867</a>
+            <a id="footerFacebook" href="https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/" target="_blank" rel="noopener noreferrer">Facebook page</a>
           </div>
         </div>
       </footer>
@@ -1184,7 +1184,7 @@
       let serviceItems = Array.isArray(siteData.serviceItems)
         ? siteData.serviceItems.filter((service) => service && typeof service === 'object')
         : defaultServices;
-      const whatsappNumber = '254743313867';
+      let whatsappNumber = '254743313867';
       const siteBaseUrl = new URL('./', window.location.href);
       const serviceCards = document.getElementById('serviceCards');
       const areaRange = document.getElementById('areaRange');
@@ -1223,6 +1223,8 @@
       }
 
       function getServiceImages(service) {
+        const customImages = Array.isArray(service.images) ? service.images.filter(Boolean) : [];
+        if (customImages.length) return customImages.map(resolveServiceImageUrl);
         const candidates = [service.title, service.id, serviceFolderAliases[service.id]].filter(Boolean);
         for (const candidate of candidates) {
           const normalizedName = normalizeFolderName(candidate);
@@ -1319,9 +1321,42 @@
 
       async function initializeSiteData() {
         await loadPublishedSiteData();
+        applyHomepageSettings();
         migrateStoredCatalog();
         updateEstimate();
         loadServiceImages();
+      }
+
+      function applyHomepageSettings() {
+        const contact = siteData.contact || {};
+        const brandName = siteData.brandName || 'Aspen Leaf Scape';
+        const brandSubtitle = siteData.brandSubtitle || 'Landscaping & Design';
+        whatsappNumber = String(contact.whatsapp || '254743313867').replace(/\D/g, '') || '254743313867';
+        document.getElementById('headerBrandName').textContent = brandName;
+        document.getElementById('footerBrandName').textContent = brandName;
+        document.getElementById('headerBrandSubtitle').textContent = brandSubtitle;
+        document.getElementById('footerBrandSubtitle').textContent = brandSubtitle;
+        document.getElementById('heroHeadline').textContent = siteData.heroHeadline || 'Transform Your Outdoor Elegantly';
+        document.getElementById('heroSubtitle').textContent = siteData.heroSubtitle || '';
+        const logoUrl = siteData.logoUrl || 'assets/aspen-leaf-logo.jpeg';
+        const heroLogoUrl = siteData.heroLogoUrl || 'assets/aspen-leaf-logo-hero.png';
+        document.getElementById('headerLogo').src = resolveServiceImageUrl(logoUrl);
+        document.getElementById('footerLogo').src = resolveServiceImageUrl(logoUrl);
+        document.getElementById('heroLogo').src = resolveServiceImageUrl(heroLogoUrl);
+        document.querySelector('.hero-visual').style.backgroundImage = siteData.heroBgUrl ? `url("${String(siteData.heroBgUrl).replace(/"/g, '%22')}")` : '';
+        document.getElementById('contactHeading').textContent = contact.heading || '';
+        document.getElementById('contactLocation').textContent = contact.location || '';
+        document.getElementById('contactHours').textContent = contact.hours || '';
+        const whatsappHref = `https://wa.me/${whatsappNumber}`;
+        const whatsappLabel = contact.phone || `+${whatsappNumber}`;
+        document.getElementById('contactWhatsapp').href = whatsappHref;
+        document.getElementById('contactWhatsapp').textContent = `WhatsApp ${whatsappLabel}`;
+        document.getElementById('footerWebsite').textContent = contact.website || '';
+        document.getElementById('footerEmail').textContent = contact.email || '';
+        document.getElementById('footerWhatsapp').href = whatsappHref;
+        document.getElementById('footerWhatsapp').textContent = `WhatsApp: ${whatsappLabel}`;
+        document.getElementById('footerFacebook').href = contact.facebook || '#';
+        document.getElementById('footerFacebookIcon').href = contact.facebook || '#';
       }
 
       async function loadServiceImages() {
@@ -1363,6 +1398,8 @@
         }
         if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = defaultServices;
         serviceItems = siteData.serviceItems.filter((service) => service && typeof service === 'object');
+        applyHomepageSettings();
+        updateEstimate();
         if (serviceImagesLoaded) renderServiceCatalog();
       });
 
@@ -1376,10 +1413,11 @@
         services.forEach((box) => {
           if (box.checked) {
             const service = box.dataset.service;
-            if (service === 'mowing') extras += 320;
-            if (service === 'watering') extras += 260;
-            if (service === 'planting') extras += 430;
-            if (service === 'hardscape') extras += 540;
+            const configuredExtras = siteData.estimatorExtras || {};
+            if (service === 'mowing') extras += Number(configuredExtras.lawnCare ?? 320);
+            if (service === 'watering') extras += Number(configuredExtras.irrigation ?? 260);
+            if (service === 'planting') extras += Number(configuredExtras.planting ?? 430);
+            if (service === 'hardscape') extras += Number(configuredExtras.hardscape ?? 540);
           }
         });
 
@@ -1438,7 +1476,7 @@
             renderReviews([]);
           }
           reviewSubmit.disabled = true;
-          reviewStatus.innerHTML = 'Review submission is unavailable on this static host. <a href="https://wa.me/254743313867?text=I%20would%20like%20to%20share%20a%20review%20for%20Aspen%20Leaf%20Scape">Contact us on WhatsApp</a>.';
+            reviewStatus.innerHTML = `Review submission is unavailable on this static host. <a href="${whatsappLink('I would like to share a review for Aspen Leaf Scape')}">Contact us on WhatsApp</a>.`;
         }
       }
 
@@ -1523,7 +1561,7 @@
         event.preventDefault();
         const form = event.currentTarget;
         const details = [
-          `Hello Aspen Leaf Scape, I would like to request a consultation.`,
+          `Hello ${siteData.brandName || 'Aspen Leaf Scape'}, I would like to request a consultation.`,
           `Name: ${form.elements.name.value}`,
           `Phone: ${form.elements.phone.value}`,
           `Service: ${form.elements.service.value}`,

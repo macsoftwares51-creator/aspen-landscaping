@@ -29,6 +29,7 @@ if (process.env.CLOUDINARY_CLOUD_NAME) {
 const port = Number(process.env.PORT || 3000);
 const githubApi = 'https://api.github.com';
 const reviewPath = 'reviews.json';
+const settingsPath = 'site-data.json';
 const reviewRateLimits = new Map();
 const loginRateLimits = new Map();
 const adminCookieName = 'aspen_admin_session';
@@ -114,9 +115,13 @@ function githubHeaders() {
 }
 
 function contentsUrl() {
+    return githubContentsUrl(reviewPath);
+}
+
+function githubContentsUrl(filePath) {
     const owner = encodeURIComponent(process.env.GITHUB_OWNER);
     const repo = encodeURIComponent(process.env.GITHUB_REPO);
-    return `${githubApi}/repos/${owner}/${repo}/contents/${reviewPath}`;
+    return `${githubApi}/repos/${owner}/${repo}/contents/${filePath}`;
 }
 
 async function readReviews() {
@@ -175,6 +180,29 @@ async function saveReview(review) {
             })
         });
         if (response.ok) return;
+        if (response.status !== 409 && response.status !== 422) {
+            throw new Error(`GitHub write failed (${response.status}).`);
+        }
+    }
+    throw new Error('Reviews are busy being updated. Please try again shortly.');
+}
+
+async function deleteReview(reviewId) {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        const current = await readReviews();
+        const reviews = current.reviews.filter((review) => String(review.id) !== reviewId);
+        if (reviews.length === current.reviews.length) return false;
+        const content = Buffer.from(`${JSON.stringify(reviews, null, 2)}\n`).toString('base64');
+        const response = await fetch(contentsUrl(), {
+            method: 'PUT',
+            headers: { ...githubHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: 'Delete customer review',
+                content,
+                ...(current.sha ? { sha: current.sha } : {})
+            })
+        });
+        if (response.ok) return true;
         if (response.status !== 409 && response.status !== 422) {
             throw new Error(`GitHub write failed (${response.status}).`);
         }
@@ -283,12 +311,37 @@ const server = http.createServer(async (request, response) => {
         }
     }
 
+    if (requestUrl.pathname === '/api/admin/reviews' && request.method === 'GET') {
+        if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
+        if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'Review service is not configured yet.' });
+        try {
+            const { reviews } = await readReviews();
+            return sendJson(response, 200, { reviews });
+        } catch (error) {
+            console.error(error);
+            return sendJson(response, 502, { error: 'Could not load reviews from GitHub.' });
+        }
+    }
+
+    if (requestUrl.pathname.startsWith('/api/admin/reviews/') && request.method === 'DELETE') {
+        if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
+        if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'Review service is not configured yet.' });
+        const reviewId = decodeURIComponent(requestUrl.pathname.slice('/api/admin/reviews/'.length));
+        if (!reviewId || reviewId.includes('/')) return sendJson(response, 400, { error: 'Invalid review ID.' });
+        try {
+            const deleted = await deleteReview(reviewId);
+            return deleted ? sendJson(response, 200, { ok: true }) : sendJson(response, 404, { error: 'Review not found.' });
+        } catch (error) {
+            console.error(error);
+            return sendJson(response, 502, { error: 'Could not delete the review from GitHub.' });
+        }
+    }
+
     if (requestUrl.pathname === '/api/admin/settings' && request.method === 'POST') {
         if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
         if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'GitHub config missing on server.' });
         try {
             const body = await readLargeRequestBody(request);
-            const settingsPath = 'site-data.json';
             const owner = encodeURIComponent(process.env.GITHUB_OWNER);
             const repo = encodeURIComponent(process.env.GITHUB_REPO);
             const endpoint = `${githubApi}/repos/${owner}/${repo}/contents/${settingsPath}`;

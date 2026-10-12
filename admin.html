@@ -32,6 +32,7 @@
         .admin-input { transition: border-color .2s ease, box-shadow .2s ease; }
         .admin-input:focus { border-color: #1E3A2B; box-shadow: 0 0 0 3px rgba(30, 58, 43, .1); outline: none; }
         .admin-thumb { width: 100%; height: 120px; object-fit: cover; border: 1px solid #e5e7eb; border-radius: .75rem; background: #f3f4f6; }
+        .admin-gallery { min-height: 92px; resize: vertical; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -62,6 +63,20 @@
                     <label class="text-xs font-semibold text-gray-700">Hero subtitle<input type="text" id="admin-hero-subtitle" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
                     <label class="text-xs font-semibold text-gray-700">Estimator base monthly rate (Kshs)<input type="number" min="0" step="1" id="admin-estimator-base-rate" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
                     <label class="text-xs font-semibold text-gray-700">Estimator cost per 1,000 sq ft (Kshs)<input type="number" min="0" step="0.5" id="admin-estimator-per-1000" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Lawn care add-on (Kshs)<input type="number" min="0" step="1" id="admin-price-lawn-care" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Irrigation add-on (Kshs)<input type="number" min="0" step="1" id="admin-price-irrigation" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Planting add-on (Kshs)<input type="number" min="0" step="1" id="admin-price-planting" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Hardscaping add-on (Kshs)<input type="number" min="0" step="1" id="admin-price-hardscape" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                </div>
+            </section>
+
+            <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-start gap-3"><i class="fa-solid fa-id-card text-brand-accent mt-1"></i><div><h2 class="font-bold text-brand-deep">Branding</h2><p class="text-xs text-gray-500 mt-1">Update the logo and brand text shown across the homepage.</p></div></div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <label class="text-xs font-semibold text-gray-700">Brand name<input type="text" id="admin-brand-name" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Brand subtitle<input type="text" id="admin-brand-subtitle" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <div class="space-y-2"><label for="admin-logo-img-url" class="text-xs font-semibold text-gray-700">Header/footer logo</label><img id="admin-preview-logo" class="admin-thumb" alt="Logo preview"><input type="text" inputmode="url" id="admin-logo-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/logo.png"><input type="file" id="admin-upload-logo" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleCloudinaryUpload('logo')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Upload logo</button></div>
+                    <div class="space-y-2"><label for="admin-hero-logo-img-url" class="text-xs font-semibold text-gray-700">Hero logo image</label><img id="admin-preview-hero-logo" class="admin-thumb" alt="Hero logo preview"><input type="text" inputmode="url" id="admin-hero-logo-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/hero-logo.png"><input type="file" id="admin-upload-hero-logo" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleCloudinaryUpload('heroLogo')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Upload hero logo</button></div>
                 </div>
             </section>
 
@@ -81,6 +96,25 @@
                     <div class="space-y-2"><label for="admin-after-img-url" class="text-xs font-semibold text-gray-700">After photo URL</label><img id="admin-preview-after" class="admin-thumb" alt="After image preview"><input type="text" inputmode="url" id="admin-after-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-after" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleCloudinaryUpload('after')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Upload to Cloudinary</button></div>
                 </div>
             </section>
+            <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-start gap-3"><i class="fa-solid fa-address-book text-brand-accent mt-1"></i><div><h2 class="font-bold text-brand-deep">Contact details</h2><p class="text-xs text-gray-500 mt-1">These values replace the contact card and footer details on the homepage.</p></div></div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <label class="text-xs font-semibold text-gray-700">Contact heading<input type="text" id="admin-contact-heading" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Location<input type="text" id="admin-contact-location" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Opening hours<input type="text" id="admin-contact-hours" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Phone number<input type="text" id="admin-contact-phone" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">WhatsApp number<input type="text" id="admin-contact-whatsapp" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm" placeholder="254743313867"></label>
+                    <label class="text-xs font-semibold text-gray-700">Email<input type="email" id="admin-contact-email" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Website<input type="text" id="admin-contact-website" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                    <label class="text-xs font-semibold text-gray-700">Facebook URL<input type="url" id="admin-contact-facebook" class="admin-input mt-1 w-full p-2.5 border border-gray-300 rounded-lg text-sm"></label>
+                </div>
+            </section>
+
+            <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-start gap-3"><i class="fa-solid fa-comments text-brand-accent mt-1"></i><div><h2 class="font-bold text-brand-deep">Customer reviews</h2><p class="text-xs text-gray-500 mt-1">Remove reviews from the public homepage. This requires GitHub review storage to be configured.</p></div></div>
+                <div id="admin-reviews-list" class="space-y-3"><p class="text-sm text-gray-500">Loading reviews...</p></div>
+            </section>
+
             <div class="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 bg-[#f3f5ef]/95 py-4 backdrop-blur">
                 <p id="save-status" role="status" class="text-xs font-semibold text-emerald-800">Changes are saved in this browser.</p>
                 <div class="flex gap-3"><a href="/" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-semibold">Cancel</a><button type="submit" class="px-5 py-2.5 bg-brand-accent hover:bg-amber-700 text-white rounded-lg text-sm font-bold"><i class="fa-solid fa-floppy-disk mr-2"></i>Save Settings</button></div>
@@ -113,6 +147,8 @@
 
         const STORAGE_KEY = 'verdant-edge-site-data-v2';
         const defaultSiteData = {
+            brandName: 'Aspen Leaf Scape',
+            brandSubtitle: 'Landscaping & Design',
             heroHeadline: 'Transforming Lawns into Living Masterpieces',
             heroSubtitle: 'Full-service landscaping, automated care schedules, and custom hardscaping.',
             mowingPrice: '45',
@@ -120,19 +156,39 @@
             designPrice: '350',
             estimatorBaseRate: 120,
             estimatorPer1000: 8,
+            estimatorExtras: { lawnCare: 320, irrigation: 260, planting: 430, hardscape: 540 },
             catalogVersion: 1,
+            logoUrl: 'assets/aspen-leaf-logo.jpeg',
+            heroLogoUrl: 'assets/aspen-leaf-logo-hero.png',
             heroBgUrl: 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80',
             beforeImageUrl: 'https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80',
             afterImageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80',
             serviceItems: [
-                { id: 'arabic-grass', title: 'Arabic Grass Installation', description: 'Fresh, even lawns with quality grass supply and careful installation.', price: 0, image: '', beforeImage: '', afterImage: '' },
-                { id: 'kabro-installation', title: 'Kabro Installation', description: 'Durable patterned paving for driveways, walkways, and outdoor areas.', price: 0, image: '', beforeImage: '', afterImage: '' },
-                { id: 'garden-maintenance', title: 'Garden Maintenance', description: 'Reliable pruning, lawn care, weeding, and seasonal garden upkeep.', price: 0, image: '', beforeImage: '', afterImage: '' },
-                { id: 'mazeras-installation', title: 'Mazeras Installation', description: 'Natural stone finishes for paths, patios, steps, and garden features.', price: 0, image: '', beforeImage: '', afterImage: '' },
-                { id: 'landscape-design', title: 'Landscape Design', description: 'A considered plan for planting, paving, lawns, and outdoor living.', price: 0, image: '', beforeImage: '', afterImage: '' }
-            ]
+                { id: 'arabic-grass', title: 'Arabic Grass Installation', description: 'Fresh, even lawns with quality grass supply and careful installation.', price: 0, image: '', images: [], beforeImage: '', afterImage: '' },
+                { id: 'kabro-installation', title: 'Kabro Installation', description: 'Durable patterned paving for driveways, walkways, and outdoor areas.', price: 0, image: '', images: [], beforeImage: '', afterImage: '' },
+                { id: 'garden-maintenance', title: 'Garden Maintenance', description: 'Reliable pruning, lawn care, weeding, and seasonal garden upkeep.', price: 0, image: '', images: [], beforeImage: '', afterImage: '' },
+                { id: 'mazeras-installation', title: 'Mazeras Installation', description: 'Natural stone finishes for paths, patios, steps, and garden features.', price: 0, image: '', images: [], beforeImage: '', afterImage: '' },
+                { id: 'landscape-design', title: 'Landscape Design', description: 'A considered plan for planting, paving, lawns, and outdoor living.', price: 0, image: '', images: [], beforeImage: '', afterImage: '' }
+            ],
+            contact: {
+                heading: 'Make your outdoor space feel like home.',
+                location: 'Riverside, Nairobi • Serving homes and businesses across the city',
+                hours: 'Mon–Sat | 8:00 AM – 6:00 PM',
+                phone: '+254 743 313867',
+                whatsapp: '254743313867',
+                email: 'hello@aspenleafscape.com',
+                website: 'aspenleafscape.com',
+                facebook: 'https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/'
+            }
         };
         let siteData = structuredClone(defaultSiteData);
+
+        function ensureSiteDataShape() {
+            siteData.estimatorExtras = { ...defaultSiteData.estimatorExtras, ...(siteData.estimatorExtras || {}) };
+            siteData.contact = { ...defaultSiteData.contact, ...(siteData.contact || {}) };
+            if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = structuredClone(defaultSiteData.serviceItems);
+            siteData.serviceItems = siteData.serviceItems.map((service) => ({ ...service, images: Array.isArray(service.images) ? service.images : [] }));
+        }
 
         function escapeHtml(value = '') {
             return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -156,7 +212,8 @@
                         <label class="text-[10px] uppercase font-bold text-gray-600">Price (Kshs)<input data-service-field="price" data-index="${index}" type="number" min="0" step="1" value="${Number(service.price || 0)}" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case"></label>
                     </div>
                     <label class="block text-[10px] uppercase font-bold text-gray-600">Description<textarea data-service-field="description" data-index="${index}" rows="2" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case">${escapeHtml(service.description || '')}</textarea></label>
-                    <div class="grid sm:grid-cols-3 gap-3">
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2"><p class="text-[10px] uppercase font-bold text-gray-600">Service slideshow URLs</p><textarea data-service-field="images" data-index="${index}" class="admin-input admin-gallery mt-1 w-full p-2 border rounded text-xs" placeholder="One image URL per line">${escapeHtml((Array.isArray(service.images) ? service.images : []).join('\n'))}</textarea><input data-service-upload="images" data-index="${index}" type="file" accept="image/*" multiple class="mt-1 block w-full text-xs"><p class="text-[10px] text-gray-500 mt-1">Paste URLs or choose multiple files to add them to this service slideshow.</p></div>
                         <div><p class="text-[10px] uppercase font-bold text-gray-600">Service photo</p><img data-service-preview="image" data-index="${index}" src="${escapeHtml(service.image || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="Service photo preview"><input data-service-field="image" data-index="${index}" value="${escapeHtml(service.image || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="image" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
                         <div><p class="text-[10px] uppercase font-bold text-gray-600">Before photo</p><img data-service-preview="beforeImage" data-index="${index}" src="${escapeHtml(service.beforeImage || siteData.beforeImageUrl || '')}" class="admin-thumb my-1" alt="Before photo preview"><input data-service-field="beforeImage" data-index="${index}" value="${escapeHtml(service.beforeImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="beforeImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
                         <div><p class="text-[10px] uppercase font-bold text-gray-600">After photo</p><img data-service-preview="afterImage" data-index="${index}" src="${escapeHtml(service.afterImage || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="After photo preview"><input data-service-field="afterImage" data-index="${index}" value="${escapeHtml(service.afterImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="afterImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
@@ -166,35 +223,76 @@
         }
 
         function populateAdminFields() {
+            ensureSiteDataShape();
+            document.getElementById('admin-brand-name').value = siteData.brandName || '';
+            document.getElementById('admin-brand-subtitle').value = siteData.brandSubtitle || '';
             document.getElementById('admin-hero-headline').value = siteData.heroHeadline;
             document.getElementById('admin-hero-subtitle').value = siteData.heroSubtitle;
             document.getElementById('admin-estimator-base-rate').value = siteData.estimatorBaseRate ?? 120;
             document.getElementById('admin-estimator-per-1000').value = siteData.estimatorPer1000 ?? 8;
+            document.getElementById('admin-price-lawn-care').value = siteData.estimatorExtras.lawnCare;
+            document.getElementById('admin-price-irrigation').value = siteData.estimatorExtras.irrigation;
+            document.getElementById('admin-price-planting').value = siteData.estimatorExtras.planting;
+            document.getElementById('admin-price-hardscape').value = siteData.estimatorExtras.hardscape;
+            document.getElementById('admin-logo-img-url').value = siteData.logoUrl || '';
+            document.getElementById('admin-hero-logo-img-url').value = siteData.heroLogoUrl || '';
             document.getElementById('admin-hero-img-url').value = siteData.heroBgUrl;
             document.getElementById('admin-before-img-url').value = siteData.beforeImageUrl;
             document.getElementById('admin-after-img-url').value = siteData.afterImageUrl;
+            document.getElementById('admin-contact-heading').value = siteData.contact.heading;
+            document.getElementById('admin-contact-location').value = siteData.contact.location;
+            document.getElementById('admin-contact-hours').value = siteData.contact.hours;
+            document.getElementById('admin-contact-phone').value = siteData.contact.phone;
+            document.getElementById('admin-contact-whatsapp').value = siteData.contact.whatsapp;
+            document.getElementById('admin-contact-email').value = siteData.contact.email;
+            document.getElementById('admin-contact-website').value = siteData.contact.website;
+            document.getElementById('admin-contact-facebook').value = siteData.contact.facebook;
             refreshImagePreviews();
             renderServiceEditor();
         }
 
         function refreshImagePreviews() {
+            document.getElementById('admin-preview-logo').src = document.getElementById('admin-logo-img-url').value || '';
+            document.getElementById('admin-preview-hero-logo').src = document.getElementById('admin-hero-logo-img-url').value || '';
             document.getElementById('admin-preview-hero').src = document.getElementById('admin-hero-img-url').value || '';
             document.getElementById('admin-preview-before').src = document.getElementById('admin-before-img-url').value || '';
             document.getElementById('admin-preview-after').src = document.getElementById('admin-after-img-url').value || '';
         }
 
         function syncFormToData() {
+            siteData.brandName = document.getElementById('admin-brand-name').value.trim();
+            siteData.brandSubtitle = document.getElementById('admin-brand-subtitle').value.trim();
             siteData.heroHeadline = document.getElementById('admin-hero-headline').value;
             siteData.heroSubtitle = document.getElementById('admin-hero-subtitle').value;
             siteData.estimatorBaseRate = Number(document.getElementById('admin-estimator-base-rate').value || 0);
             siteData.estimatorPer1000 = Number(document.getElementById('admin-estimator-per-1000').value || 0);
+            siteData.estimatorExtras = {
+                lawnCare: Number(document.getElementById('admin-price-lawn-care').value || 0),
+                irrigation: Number(document.getElementById('admin-price-irrigation').value || 0),
+                planting: Number(document.getElementById('admin-price-planting').value || 0),
+                hardscape: Number(document.getElementById('admin-price-hardscape').value || 0)
+            };
+            siteData.logoUrl = document.getElementById('admin-logo-img-url').value.trim();
+            siteData.heroLogoUrl = document.getElementById('admin-hero-logo-img-url').value.trim();
             siteData.heroBgUrl = document.getElementById('admin-hero-img-url').value;
             siteData.beforeImageUrl = document.getElementById('admin-before-img-url').value;
             siteData.afterImageUrl = document.getElementById('admin-after-img-url').value;
+            siteData.contact = {
+                heading: document.getElementById('admin-contact-heading').value.trim(),
+                location: document.getElementById('admin-contact-location').value.trim(),
+                hours: document.getElementById('admin-contact-hours').value.trim(),
+                phone: document.getElementById('admin-contact-phone').value.trim(),
+                whatsapp: document.getElementById('admin-contact-whatsapp').value.replace(/\D/g, ''),
+                email: document.getElementById('admin-contact-email').value.trim(),
+                website: document.getElementById('admin-contact-website').value.trim(),
+                facebook: document.getElementById('admin-contact-facebook').value.trim()
+            };
             document.querySelectorAll('[data-service-field]').forEach((field) => {
                 const service = siteData.serviceItems[Number(field.dataset.index)];
                 if (!service) return;
-                service[field.dataset.serviceField] = field.dataset.serviceField === 'price' ? Number(field.value || 0) : field.value;
+                if (field.dataset.serviceField === 'price') service.price = Number(field.value || 0);
+                else if (field.dataset.serviceField === 'images') service.images = field.value.split(/\r?\n/).map((url) => url.trim()).filter(Boolean);
+                else service[field.dataset.serviceField] = field.value;
             });
             if (siteData.serviceItems[0]?.id === 'mowing') siteData.mowingPrice = siteData.serviceItems[0].price;
         }
@@ -205,9 +303,18 @@
             saveSiteData();
         }
 
+        async function uploadImageFile(file) {
+            const response = await fetch('/api/admin/upload', { method: 'POST', body: file });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Upload failed.');
+            return result.url;
+        }
+
         async function handleCloudinaryUpload(type) {
-            const fileInput = document.getElementById(`admin-upload-${type}`);
-            const urlInput = document.getElementById(`admin-${type === 'hero' ? 'hero' : type}-img-url`);
+            const inputIds = { hero: 'admin-upload-hero', before: 'admin-upload-before', after: 'admin-upload-after', logo: 'admin-upload-logo', heroLogo: 'admin-upload-hero-logo' };
+            const urlInputIds = { hero: 'admin-hero-img-url', before: 'admin-before-img-url', after: 'admin-after-img-url', logo: 'admin-logo-img-url', heroLogo: 'admin-hero-logo-img-url' };
+            const fileInput = document.getElementById(inputIds[type]);
+            const urlInput = document.getElementById(urlInputIds[type]);
             const file = fileInput.files?.[0];
             if (!file) { alert('Choose an image file first.'); return; }
 
@@ -215,14 +322,7 @@
             status.textContent = 'Uploading image to Cloudinary...';
 
             try {
-                const response = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: file
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Upload failed.');
-
-                urlInput.value = result.url;
+                urlInput.value = await uploadImageFile(file);
                 refreshImagePreviews();
                 syncFormToData();
                 saveSiteData('Image uploaded and settings saved.');
@@ -255,6 +355,41 @@
             }
         }
 
+        function renderAdminReviews(reviews) {
+            const container = document.getElementById('admin-reviews-list');
+            if (!reviews.length) {
+                container.innerHTML = '<p class="text-sm text-gray-500">No customer reviews found.</p>';
+                return;
+            }
+            container.innerHTML = reviews.map((review) => `<article class="rounded-xl border border-gray-200 bg-white p-4 flex flex-wrap items-start justify-between gap-4"><div><p class="font-bold text-brand-deep">${escapeHtml(review.name || 'Customer')} <span class="text-amber-600">${'★'.repeat(Math.max(1, Math.min(5, Number(review.rating) || 1)))}</span></p><p class="mt-1 text-sm text-gray-600 whitespace-pre-wrap">${escapeHtml(review.message || '')}</p><p class="mt-2 text-xs text-gray-400">${escapeHtml(review.createdAt || '')}</p></div><button type="button" data-delete-review="${escapeHtml(review.id || '')}" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-bold">Delete review</button></article>`).join('');
+        }
+
+        async function loadAdminReviews() {
+            const container = document.getElementById('admin-reviews-list');
+            try {
+                const response = await fetch('/api/admin/reviews', { cache: 'no-store' });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not load reviews.');
+                renderAdminReviews(Array.isArray(result.reviews) ? result.reviews : []);
+            } catch (error) {
+                container.innerHTML = `<p class="text-sm text-rose-700">${escapeHtml(error.message)}</p>`;
+            }
+        }
+
+        async function deleteReview(reviewId, button) {
+            if (!reviewId || !window.confirm('Delete this review from the public site?')) return;
+            button.disabled = true;
+            try {
+                const response = await fetch(`/api/admin/reviews/${encodeURIComponent(reviewId)}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not delete review.');
+                await loadAdminReviews();
+            } catch (error) {
+                button.disabled = false;
+                document.getElementById('save-status').textContent = error.message;
+            }
+        }
+
         document.getElementById('admin-form').addEventListener('input', (event) => {
             if (event.target.matches('[data-service-field]')) {
                 const field = event.target;
@@ -274,25 +409,28 @@
             if (upload?.files?.[0]) {
                 const index = Number(upload.dataset.index);
                 const fieldName = upload.dataset.serviceUpload;
-                const file = upload.files[0];
+                const files = [...upload.files];
 
                 const status = document.getElementById('save-status');
                 status.textContent = 'Uploading service image to Cloudinary...';
 
                 try {
-                    const response = await fetch('/api/admin/upload', {
-                        method: 'POST',
-                        body: file
-                    });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || 'Upload failed.');
-
+                    const urls = [];
+                    for (const file of files) urls.push(await uploadImageFile(file));
+                    const service = siteData.serviceItems[index];
                     const imageField = document.querySelector(`[data-service-field="${fieldName}"][data-index="${index}"]`);
-                    imageField.value = result.url;
+                    if (fieldName === 'images') {
+                        service.images = [...(service.images || []), ...urls];
+                        imageField.value = service.images.join('\n');
+                    } else {
+                        imageField.value = urls[0];
+                        service[fieldName] = urls[0];
+                    }
                     syncFormToData();
                     const preview = document.querySelector(`[data-service-preview="${fieldName}"][data-index="${index}"]`);
-                    if (preview) preview.src = result.url;
+                    if (preview) preview.src = urls[0];
                     saveSiteData('Service image uploaded successfully.');
+                    if (fieldName === 'images') renderServiceEditor();
                 } catch (error) {
                     status.textContent = `Upload failed: ${error.message}`;
                 }
@@ -300,6 +438,11 @@
         });
 
         document.addEventListener('click', (event) => {
+            const reviewButton = event.target.closest('[data-delete-review]');
+            if (reviewButton) {
+                deleteReview(reviewButton.dataset.deleteReview, reviewButton);
+                return;
+            }
             const removeButton = event.target.closest('[data-remove-service]');
             if (!removeButton) return;
             siteData.serviceItems.splice(Number(removeButton.dataset.removeService), 1);
@@ -317,9 +460,22 @@
         } catch (error) {
             document.getElementById('save-status').textContent = 'Saved settings could not be read; defaults are shown.';
         }
-        if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = [...defaultSiteData.serviceItems];
-        populateAdminFields();
-        verifyAdminSession();
+
+        async function initializeAdmin() {
+            if (!savedSiteData) {
+                try {
+                    const response = await fetch('/site-data.json', { cache: 'no-store' });
+                    if (response.ok) siteData = { ...siteData, ...(await response.json()) };
+                } catch (error) {
+                    // Defaults remain available if the published settings file cannot be loaded.
+                }
+            }
+            ensureSiteDataShape();
+            populateAdminFields();
+            await verifyAdminSession();
+            if (!document.getElementById('admin-app').classList.contains('hidden')) loadAdminReviews();
+        }
+        initializeAdmin();
     </script>
 </body>
 </html>

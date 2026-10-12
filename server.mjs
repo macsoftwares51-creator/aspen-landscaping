@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -32,6 +32,7 @@ const reviewPath = 'reviews.json';
 const reviewRateLimits = new Map();
 const loginRateLimits = new Map();
 const adminCookieName = 'aspen_admin_session';
+const maxUploadBytes = 10 * 1024 * 1024;
 
 function sendJson(response, status, payload) {
     response.writeHead(status, {
@@ -216,10 +217,14 @@ const server = http.createServer(async (request, response) => {
     if (requestUrl.pathname === '/api/admin/upload' && request.method === 'POST') {
         if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
         if (!process.env.CLOUDINARY_CLOUD_NAME) return sendJson(response, 503, { error: 'Cloudinary is not configured on the server.' });
+        if (Number(request.headers['content-length']) > maxUploadBytes) return sendJson(response, 413, { error: 'Image is too large. Maximum size is 10 MB.' });
         
         try {
             const chunks = [];
+            let size = 0;
             for await (const chunk of request) {
+                size += chunk.length;
+                if (size > maxUploadBytes) return sendJson(response, 413, { error: 'Image is too large. Maximum size is 10 MB.' });
                 chunks.push(chunk);
             }
             const buffer = Buffer.concat(chunks);
@@ -266,7 +271,7 @@ const server = http.createServer(async (request, response) => {
             if (name.length < 2 || message.length < 10 || !Number.isInteger(rating) || rating < 1 || rating > 5) {
                 return sendJson(response, 400, { error: 'Enter your name, a 1–5 star rating, and a review of at least 10 characters.' });
             }
-            const review = { id: crypto.randomUUID(), name, rating, message, createdAt: new Date().toISOString() };
+            const review = { id: randomUUID(), name, rating, message, createdAt: new Date().toISOString() };
             await saveReview(review);
             return sendJson(response, 201, { ok: true, review });
         } catch (error) {
@@ -359,7 +364,8 @@ const server = http.createServer(async (request, response) => {
     const servicePicture = /^pictures\/[A-Za-z0-9 _-]+\/[A-Za-z0-9._-]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(page);
     const serviceImageManifest = page === 'pictures/service-images.json';
     const staticReviews = page === 'reviews.json';
-    if (!['index.html', 'admin.html'].includes(page) && !imageAssets.has(page) && !servicePicture && !serviceImageManifest && !staticReviews) {
+    const staticSiteData = page === 'site-data.json';
+    if (!['index.html', 'admin.html'].includes(page) && !imageAssets.has(page) && !servicePicture && !serviceImageManifest && !staticReviews && !staticSiteData) {
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         return response.end('Not found');
     }
@@ -376,7 +382,7 @@ const server = http.createServer(async (request, response) => {
         const content = await readFile(path.join(root, page));
         const extension = path.extname(page).toLowerCase();
         response.writeHead(200, {
-            'Content-Type': serviceImageManifest || staticReviews ? 'application/json; charset=utf-8' : extension === '.png' ? 'image/png' : extension === '.webp' ? 'image/webp' : extension === '.avif' ? 'image/avif' : extension === '.gif' ? 'image/gif' : imageAssets.has(page) || servicePicture ? 'image/jpeg' : 'text/html; charset=utf-8',
+            'Content-Type': serviceImageManifest || staticReviews || staticSiteData ? 'application/json; charset=utf-8' : extension === '.png' ? 'image/png' : extension === '.webp' ? 'image/webp' : extension === '.avif' ? 'image/avif' : extension === '.gif' ? 'image/gif' : imageAssets.has(page) || servicePicture ? 'image/jpeg' : 'text/html; charset=utf-8',
             ...(page === 'admin.html' ? { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } : {}),
             'X-Content-Type-Options': 'nosniff',
             'Referrer-Policy': 'strict-origin-when-cross-origin'

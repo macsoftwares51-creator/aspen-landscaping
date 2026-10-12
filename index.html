@@ -925,7 +925,7 @@
             <h1 class="headline">Transform Your Outdoor <span class="line-break">Elegantly</span></h1>
             <div class="headline-rule" aria-hidden="true"></div>
             <p class="subtext">
-              Let us transform your outdoor space into a stunning haven. We help you bring your vision to life!
+              Let us transform your outdoor space into a stunning haven. we help you bring your vision to life.
             </p>
 
             <div class="cta-row">
@@ -1303,7 +1303,27 @@
         serviceItems.forEach((service) => serviceSelect.add(new Option(service.title || 'Landscaping service', service.title || 'Landscaping service')));
       }
 
-      migrateStoredCatalog();
+      async function loadPublishedSiteData() {
+        try {
+          const response = await fetch(new URL('site-data.json', siteBaseUrl), { cache: 'no-store' });
+          if (!response.ok) return;
+          const publishedSiteData = await response.json();
+          if (!publishedSiteData || typeof publishedSiteData !== 'object' || Array.isArray(publishedSiteData)) return;
+          siteData = { ...publishedSiteData, ...siteData };
+          if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = defaultServices;
+          serviceItems = siteData.serviceItems.filter((service) => service && typeof service === 'object');
+        } catch (error) {
+          // Local defaults remain available when the published settings file is unavailable.
+        }
+      }
+
+      async function initializeSiteData() {
+        await loadPublishedSiteData();
+        migrateStoredCatalog();
+        updateEstimate();
+        loadServiceImages();
+      }
+
       async function loadServiceImages() {
         try {
           let result;
@@ -1326,7 +1346,7 @@
         serviceImagesLoaded = true;
         renderServiceCatalog();
       }
-      loadServiceImages();
+      initializeSiteData();
       setInterval(() => {
         if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         serviceItems.forEach((service, index) => {
@@ -1348,8 +1368,9 @@
 
       function updateEstimate() {
         const area = Number(areaRange.value);
-        const base = 600;
-        const areaCharge = area * 0.85;
+        const base = Number.isFinite(Number(siteData.estimatorBaseRate)) ? Number(siteData.estimatorBaseRate) : 600;
+        const perThousand = Number.isFinite(Number(siteData.estimatorPer1000)) ? Number(siteData.estimatorPer1000) : 0.85;
+        const areaCharge = (area / 1000) * perThousand;
         let extras = 0;
 
         services.forEach((box) => {

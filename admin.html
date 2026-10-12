@@ -51,7 +51,7 @@
 
     <p id="admin-auth-message" class="hidden max-w-2xl mx-auto m-6 rounded-xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">Admin access requires the password-protected Node site. Open this page through the running site server.</p>
     <main id="admin-app" class="hidden max-w-6xl mx-auto px-4 py-8 sm:py-10">
-        <form id="admin-form" class="space-y-6" onsubmit="publishToGitHub(event)">
+        <form id="admin-form" class="space-y-6" onsubmit="publishSettings(event)">
             <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
                 <div class="flex items-start gap-3">
                     <i class="fa-solid fa-pen-to-square text-brand-accent mt-1"></i>
@@ -76,9 +76,9 @@
             <section class="admin-tile rounded-2xl p-5 sm:p-6 space-y-4">
                 <div class="flex items-start gap-3"><i class="fa-solid fa-images text-brand-accent mt-1"></i><div><h2 class="font-bold text-brand-deep">Homepage Hero & Before/After Photos</h2><p class="text-xs text-gray-500 mt-1">These images appear in the main banner and transformation slider.</p></div></div>
                 <div class="grid sm:grid-cols-3 gap-4">
-                    <div class="space-y-2"><label for="admin-hero-img-url" class="text-xs font-semibold text-gray-700">Hero background image URL</label><img id="admin-preview-hero" class="admin-thumb" alt="Hero image preview"><input type="text" inputmode="url" id="admin-hero-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-hero" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleImageUpload('hero')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Use uploaded image</button></div>
-                    <div class="space-y-2"><label for="admin-before-img-url" class="text-xs font-semibold text-gray-700">Before photo URL</label><img id="admin-preview-before" class="admin-thumb" alt="Before image preview"><input type="text" inputmode="url" id="admin-before-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-before" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleImageUpload('before')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Use uploaded image</button></div>
-                    <div class="space-y-2"><label for="admin-after-img-url" class="text-xs font-semibold text-gray-700">After photo URL</label><img id="admin-preview-after" class="admin-thumb" alt="After image preview"><input type="text" inputmode="url" id="admin-after-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-after" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleImageUpload('after')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Use uploaded image</button></div>
+                    <div class="space-y-2"><label for="admin-hero-img-url" class="text-xs font-semibold text-gray-700">Hero background image URL</label><img id="admin-preview-hero" class="admin-thumb" alt="Hero image preview"><input type="text" inputmode="url" id="admin-hero-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-hero" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleCloudinaryUpload('hero')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Upload to Cloudinary</button></div>
+                    <div class="space-y-2"><label for="admin-before-img-url" class="text-xs font-semibold text-gray-700">Before photo URL</label><img id="admin-preview-before" class="admin-thumb" alt="Before image preview"><input type="text" inputmode="url" id="admin-before-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-before" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleCloudinaryUpload('before')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Upload to Cloudinary</button></div>
+                    <div class="space-y-2"><label for="admin-after-img-url" class="text-xs font-semibold text-gray-700">After photo URL</label><img id="admin-preview-after" class="admin-thumb" alt="After image preview"><input type="text" inputmode="url" id="admin-after-img-url" class="admin-input w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="https://example.com/image.jpg"><input type="file" id="admin-upload-after" accept="image/*" class="w-full text-xs"><button type="button" onclick="handleCloudinaryUpload('after')" class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-bold">Upload to Cloudinary</button></div>
                 </div>
             </section>
             <div class="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 bg-[#f3f5ef]/95 py-4 backdrop-blur">
@@ -143,7 +143,7 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
                 document.getElementById('save-status').textContent = message;
             } catch (error) {
-                document.getElementById('save-status').textContent = 'Could not save. Uploaded images may exceed browser storage limits.';
+                document.getElementById('save-status').textContent = 'Could not save.';
             }
         }
 
@@ -158,8 +158,8 @@
                     <label class="block text-[10px] uppercase font-bold text-gray-600">Description<textarea data-service-field="description" data-index="${index}" rows="2" class="admin-input mt-1 w-full p-2 border rounded text-xs normal-case">${escapeHtml(service.description || '')}</textarea></label>
                     <div class="grid sm:grid-cols-3 gap-3">
                         <div><p class="text-[10px] uppercase font-bold text-gray-600">Service photo</p><img data-service-preview="image" data-index="${index}" src="${escapeHtml(service.image || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="Service photo preview"><input data-service-field="image" data-index="${index}" value="${escapeHtml(service.image || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="image" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
-                        <div><p class="text-[10px] uppercase font-bold text-gray-600">Before photo</p><img data-service-preview="beforeImage" data-index="${index}" src="${escapeHtml(service.beforeImage || siteData.beforeImageUrl || '')}" class="admin-thumb my-1" alt="Before photo preview"><input data-service-field="beforeImage" data-index="${index}" value="${escapeHtml(service.beforeImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Uses default before photo"><input data-service-upload="beforeImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
-                        <div><p class="text-[10px] uppercase font-bold text-gray-600">After photo</p><img data-service-preview="afterImage" data-index="${index}" src="${escapeHtml(service.afterImage || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="After photo preview"><input data-service-field="afterImage" data-index="${index}" value="${escapeHtml(service.afterImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Uses default after photo"><input data-service-upload="afterImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
+                        <div><p class="text-[10px] uppercase font-bold text-gray-600">Before photo</p><img data-service-preview="beforeImage" data-index="${index}" src="${escapeHtml(service.beforeImage || siteData.beforeImageUrl || '')}" class="admin-thumb my-1" alt="Before photo preview"><input data-service-field="beforeImage" data-index="${index}" value="${escapeHtml(service.beforeImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="beforeImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
+                        <div><p class="text-[10px] uppercase font-bold text-gray-600">After photo</p><img data-service-preview="afterImage" data-index="${index}" src="${escapeHtml(service.afterImage || siteData.afterImageUrl || '')}" class="admin-thumb my-1" alt="After photo preview"><input data-service-field="afterImage" data-index="${index}" value="${escapeHtml(service.afterImage || '')}" class="admin-input w-full p-2 border rounded text-xs" placeholder="Image URL"><input data-service-upload="afterImage" data-index="${index}" type="file" accept="image/*" class="mt-1 block w-full text-xs"></div>
                     </div>
                     <div class="flex justify-end"><button type="button" data-remove-service="${index}" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-bold"><i class="fa-solid fa-trash mr-1"></i>Remove service</button></div>
                 </article>`).join('') : '<p class="rounded-lg border border-dashed p-4 text-sm text-gray-500">No services yet. Add a service to get started.</p>';
@@ -205,44 +205,55 @@
             saveSiteData();
         }
 
-        function handleImageUpload(type) {
+        async function handleCloudinaryUpload(type) {
             const fileInput = document.getElementById(`admin-upload-${type}`);
             const urlInput = document.getElementById(`admin-${type === 'hero' ? 'hero' : type}-img-url`);
             const file = fileInput.files?.[0];
             if (!file) { alert('Choose an image file first.'); return; }
-            const reader = new FileReader();
-            reader.onload = () => {
-                urlInput.value = reader.result;
+
+            const status = document.getElementById('save-status');
+            status.textContent = 'Uploading image to Cloudinary...';
+
+            try {
+                const response = await fetch('/api/admin/upload', {
+                    method: 'POST',
+                    body: file
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Upload failed.');
+
+                urlInput.value = result.url;
                 refreshImagePreviews();
                 syncFormToData();
-                saveSiteData('Image and settings saved in this browser.');
-            };
-            reader.readAsDataURL(file);
+                saveSiteData('Image uploaded and settings saved.');
+            } catch (error) {
+                status.textContent = `Image upload failed: ${error.message}`;
+            }
         }
 
-        async function publishToGitHub(event) {
-    event.preventDefault();
-    syncFormToData();
-    saveSiteData();
-    
-    const status = document.getElementById('save-status');
-    status.textContent = 'Publishing settings...';
-    
-    try {
-        const response = await fetch('/api/admin/settings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(siteData)
-        });
-        
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Publishing failed.');
-        
-        status.textContent = 'Settings saved locally and published to server/GitHub successfully.';
-    } catch (error) {
-        status.textContent = `Saved locally, but publishing failed: ${error.message}`;
-    }
-}
+        async function publishSettings(event) {
+            event.preventDefault();
+            syncFormToData();
+            saveSiteData();
+            
+            const status = document.getElementById('save-status');
+            status.textContent = 'Publishing settings to server/GitHub...';
+            
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(siteData)
+                });
+                
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Publishing failed.');
+                
+                status.textContent = 'Settings saved locally and published successfully.';
+            } catch (error) {
+                status.textContent = `Saved locally, but publishing failed: ${error.message}`;
+            }
+        }
 
         document.getElementById('admin-form').addEventListener('input', (event) => {
             if (event.target.matches('[data-service-field]')) {
@@ -252,28 +263,39 @@
                 const preview = document.querySelector(`[data-service-preview="${field.dataset.serviceField}"][data-index="${field.dataset.index}"]`);
                 const service = siteData.serviceItems[Number(field.dataset.index)];
                 if (preview && service) {
-                    preview.src = field.value || (field.dataset.serviceField === 'beforeImage' ? siteData.beforeImageUrl : field.dataset.serviceField === 'afterImage' ? siteData.afterImageUrl : '');
+                    preview.src = field.value || '';
                 }
             }
             if (event.target.matches('#admin-hero-img-url, #admin-before-img-url, #admin-after-img-url')) refreshImagePreviews();
         });
 
-        document.getElementById('admin-form').addEventListener('change', (event) => {
+        document.getElementById('admin-form').addEventListener('change', async (event) => {
             const upload = event.target.closest('[data-service-upload]');
             if (upload?.files?.[0]) {
                 const index = Number(upload.dataset.index);
                 const fieldName = upload.dataset.serviceUpload;
-                const service = siteData.serviceItems[index];
-                const reader = new FileReader();
-                reader.onload = () => {
+                const file = upload.files[0];
+
+                const status = document.getElementById('save-status');
+                status.textContent = 'Uploading service image to Cloudinary...';
+
+                try {
+                    const response = await fetch('/api/admin/upload', {
+                        method: 'POST',
+                        body: file
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || 'Upload failed.');
+
                     const imageField = document.querySelector(`[data-service-field="${fieldName}"][data-index="${index}"]`);
-                    imageField.value = reader.result;
+                    imageField.value = result.url;
                     syncFormToData();
                     const preview = document.querySelector(`[data-service-preview="${fieldName}"][data-index="${index}"]`);
-                    if (preview) preview.src = reader.result;
-                    saveSiteData('Service image saved in this browser.');
-                };
-                reader.readAsDataURL(upload.files[0]);
+                    if (preview) preview.src = result.url;
+                    saveSiteData('Service image uploaded successfully.');
+                } catch (error) {
+                    status.textContent = `Upload failed: ${error.message}`;
+                }
             }
         });
 
@@ -296,14 +318,6 @@
             document.getElementById('save-status').textContent = 'Saved settings could not be read; defaults are shown.';
         }
         if (!Array.isArray(siteData.serviceItems)) siteData.serviceItems = [...defaultSiteData.serviceItems];
-        if (savedSiteData && Number(savedSiteData.catalogVersion || 0) < 1) {
-            if (siteData.serviceItems.length) {
-                const serviceIds = new Set(siteData.serviceItems.map((service) => service.id));
-                siteData.serviceItems.push(...defaultSiteData.serviceItems.filter((service) => !serviceIds.has(service.id)).map((service) => ({ ...service })));
-            }
-            siteData.catalogVersion = 1;
-            saveSiteData('New landscaping services added. Review the catalog before publishing.');
-        }
         populateAdminFields();
         verifyAdminSession();
     </script>

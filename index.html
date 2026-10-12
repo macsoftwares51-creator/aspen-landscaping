@@ -35,6 +35,7 @@
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
+        overflow-x: clip;
         background: var(--sand);
         color: var(--ink);
         font-family: "Manrope", sans-serif;
@@ -188,11 +189,13 @@
         background-size: cover;
         background-position: center;
         opacity: 0;
-        filter: saturate(0.78);
+        filter: saturate(0.68) blur(2px);
+        -webkit-mask-image: radial-gradient(ellipse 76% 75% at center, #000 30%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.34) 76%, transparent 100%);
+        mask-image: radial-gradient(ellipse 76% 75% at center, #000 30%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.34) 76%, transparent 100%);
         transition: opacity 1.1s ease;
       }
 
-      .hero.has-hero-background::after { opacity: 0.72; }
+      .hero.has-hero-background::after { opacity: 0.58; }
 
       .hero-copy {
         padding: 12px 6px 0 12px;
@@ -400,6 +403,21 @@
         box-shadow: 0 12px 24px rgba(31, 59, 45, 0.06);
       }
 
+      .fly-in-pending { opacity: 0; transform: translateY(42px); }
+      .fly-in-active { animation: fly-in 680ms cubic-bezier(0.2, 0.72, 0.22, 1) var(--fly-in-delay, 0ms) both; }
+      .fly-in-seen { opacity: 1; transform: none; }
+
+      @keyframes fly-in {
+        from { opacity: 0; transform: translateY(42px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .fly-in-pending { opacity: 1; transform: none; }
+        .fly-in-active { animation: none; }
+        .footer.fly-in-active .footer-bloom__leaf { animation: none; }
+      }
+
       .service-card__open {
         display: block;
         width: 100%;
@@ -495,6 +513,15 @@
       .service-dialog::backdrop { background: rgba(13, 25, 20, 0.66); }
       .dialog-content { padding: 22px; }
       .dialog-heading { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 16px; }
+      #moreReviewsDialog .dialog-heading {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        margin: -8px 0 16px;
+        padding: 8px 0;
+        background: var(--paper);
+      }
+      #closeReviewsDialog { position: relative; z-index: 11; flex-shrink: 0; background: var(--paper); }
       .dialog-heading h2 { margin: 4px 0 6px; color: var(--forest); font: 600 2.2rem/1 "Cormorant Garamond", serif; }
       .dialog-heading p { margin: 0; color: var(--muted); font-size: 0.9rem; }
       .dialog-eyebrow { color: #725129; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -831,6 +858,9 @@
       #reviewSubmit:disabled { opacity: 0.55; cursor: not-allowed; }
 
       .footer {
+        position: relative;
+        isolation: isolate;
+        overflow: visible;
         background: rgba(31, 59, 45, 0.96);
         color: #edf2ee;
         border-radius: 18px 18px 0 0;
@@ -839,9 +869,36 @@
       }
 
       .footer-inner {
+        position: relative;
+        z-index: 1;
         display: grid;
         grid-template-columns: 1.2fr 1fr 1fr 1fr;
         gap: 18px;
+      }
+
+      .footer-bloom {
+        position: absolute;
+        z-index: 0;
+        top: 0;
+        bottom: -18px;
+        width: clamp(132px, 17vw, 216px);
+        color: #91b977;
+        opacity: 0.62;
+        pointer-events: none;
+      }
+      .footer-bloom--left { left: -116px; }
+      .footer-bloom--right { right: -116px; transform: scaleX(-1); }
+      .footer-bloom svg { display: block; width: 100%; height: 100%; overflow: visible; }
+      .footer-bloom__stem { fill: none; stroke: #9abf7d; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(1px 2px 2px rgba(0,0,0,.38)); }
+      .footer-bloom__leaf { fill: url(#footer-leaf-gradient); stroke: rgba(14, 38, 27, 0.65); stroke-width: 1.5; filter: drop-shadow(2px 3px 3px rgba(0,0,0,.42)); transform-box: fill-box; transform-origin: 10% 90%; }
+      .footer-bloom--right .footer-bloom__leaf { fill: url(#footer-leaf-gradient-right); }
+      .footer-bloom__vein { fill: none; stroke: rgba(218, 237, 183, .78); stroke-width: 1.15; stroke-linecap: round; filter: drop-shadow(0 1px 1px rgba(0,0,0,.48)); }
+      .footer.fly-in-active .footer-bloom__leaf { animation: footer-leaf-bloom 850ms cubic-bezier(0.18, 0.72, 0.22, 1) both; }
+      .footer.fly-in-active .footer-bloom__leaf:nth-of-type(2n) { animation-delay: 90ms; }
+      .footer.fly-in-active .footer-bloom__leaf:nth-of-type(3n) { animation-delay: 170ms; }
+      @keyframes footer-leaf-bloom {
+        from { opacity: 0; transform: scale(0.12) rotate(-28deg); }
+        to { opacity: 1; transform: scale(1) rotate(0); }
       }
 
       .footer-brand {
@@ -1067,8 +1124,8 @@
           </div>
         </section>
 
-        <section class="service-catalog" id="services" aria-labelledby="servicesHeading">
-          <div class="section-heading">
+        <section class="service-catalog" id="services" aria-labelledby="servicesHeading" data-fly-in>
+          <div class="section-heading" data-fly-in>
             <h2 id="servicesHeading">Landscaping Services</h2>
             <p>Tap a service to see a project transformation.</p>
           </div>
@@ -1105,8 +1162,8 @@
           </div>
         </dialog>
 
-        <section class="mission-grid" id="projects" aria-label="Project highlights">
-          <article class="story-card">
+        <section class="mission-grid" id="projects" aria-label="Project highlights" data-fly-in>
+          <article class="story-card" data-fly-in>
             <div class="story-media">
               <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80" alt="A landscaped garden with green grass and planting" />
               <div class="story-badge" aria-hidden="true">🌱</div>
@@ -1117,7 +1174,7 @@
             </div>
           </article>
 
-          <article class="story-card">
+          <article class="story-card" data-fly-in>
             <div class="story-media">
               <img src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=900&q=80" alt="A clean, modern landscaped urban yard" />
               <div class="story-badge" aria-hidden="true">🌳</div>
@@ -1128,7 +1185,7 @@
             </div>
           </article>
 
-          <article class="story-card">
+          <article class="story-card" data-fly-in>
             <div class="story-media">
               <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=900&q=80" alt="A relaxing garden with water elements and stone pathways" />
               <div class="story-badge" aria-hidden="true">💧</div>
@@ -1140,10 +1197,10 @@
           </article>
         </section>
 
-        <section class="quote-section" id="quote" aria-label="Quote estimator">
+        <section class="quote-section" id="quote" aria-label="Quote estimator" data-fly-in>
           <div class="quote-grid">
-            <div class="quote-form">
-              <div class="range-wrap">
+            <div class="quote-form" data-fly-in>
+              <div class="range-wrap" data-fly-in>
                 <div class="range-head">
                   <span>Garden area</span>
                   <span id="areaValue">1,200 sq ft</span>
@@ -1151,7 +1208,7 @@
                 <input id="areaRange" type="range" min="500" max="10000" step="100" value="1200" />
               </div>
 
-              <div>
+              <div data-fly-in>
                 <div class="range-head" style="margin-bottom: 12px;">
                   <span>Services required</span>
                 </div>
@@ -1164,7 +1221,7 @@
               </div>
             </div>
 
-            <aside class="pricing-box">
+            <aside class="pricing-box" data-fly-in>
               <div class="pricing-label">Estimated monthly</div>
               <div class="price">KSh <span id="estimateValue">1,820</span><small>/mo</small></div>
               <p>Includes labour, seasonal care, and recommended maintenance plan.</p>
@@ -1173,13 +1230,13 @@
           </div>
         </section>
 
-        <section class="review-section" id="reviews" aria-labelledby="reviewsHeading">
-          <div class="review-heading">
+        <section class="review-section" id="reviews" aria-labelledby="reviewsHeading" data-fly-in>
+          <div class="review-heading" data-fly-in>
             <h2 id="reviewsHeading">Customer Reviews</h2>
             <p>Read feedback shared by Aspen Leaf Scape customers, or tell us about your experience.</p>
           </div>
           <div class="review-layout">
-            <div class="form-card">
+            <div class="form-card" data-fly-in>
               <form class="contact-form" id="reviewForm">
                 <input type="text" name="name" placeholder="Your name" minlength="2" maxlength="60" autocomplete="name" required />
                 <select name="rating" required>
@@ -1216,24 +1273,24 @@
           </div>
         </dialog>
 
-        <section class="contact-wrap" id="contact">
-          <div class="contact-card">
+        <section class="contact-wrap" id="contact" data-fly-in>
+          <div class="contact-card" data-fly-in>
             <h2 id="contactHeading">Make your outdoor space feel like home.</h2>
-            <div class="contact-item">
+            <div class="contact-item" data-fly-in>
               <div class="contact-icon">📍</div>
               <div>
                 <strong>Location</strong>
                 <span id="contactLocation">Riverside, Nairobi • Serving homes and businesses across the city</span>
               </div>
             </div>
-            <div class="contact-item">
+            <div class="contact-item" data-fly-in>
               <div class="contact-icon">⏰</div>
               <div>
                 <strong>Hours</strong>
                 <span id="contactHours">Mon–Sat | 8:00 AM – 6:00 PM</span>
               </div>
             </div>
-            <div class="contact-item">
+            <div class="contact-item" data-fly-in>
               <div class="contact-icon">📞</div>
               <div>
                 <strong>Call us</strong>
@@ -1242,7 +1299,7 @@
             </div>
           </div>
 
-          <div class="form-card">
+          <div class="form-card" data-fly-in>
             <form class="contact-form" id="contactForm">
               <input type="text" name="name" placeholder="Your name" required />
               <input type="tel" name="phone" placeholder="Phone number" required />
@@ -1261,9 +1318,35 @@
         </section>
       </main>
 
-      <footer class="footer" id="donate">
+      <footer class="footer" id="donate" data-fly-in>
+        <div class="footer-bloom footer-bloom--left" aria-hidden="true">
+          <svg viewBox="0 0 150 240" preserveAspectRatio="none">
+            <defs><linearGradient id="footer-leaf-gradient" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#315d3c"/><stop offset=".48" stop-color="#75a94d"/><stop offset=".78" stop-color="#a9cc73"/><stop offset="1" stop-color="#d5e6a0"/></linearGradient></defs>
+            <path class="footer-bloom__stem" d="M8 244 C35 203 30 166 60 130 C90 94 94 54 137 4" />
+            <path class="footer-bloom__leaf" d="M35 194 C9 187 6 168 8 155 C28 157 43 170 43 188 C41 191 38 193 35 194Z" />
+            <path class="footer-bloom__leaf" d="M48 165 C49 143 66 130 82 131 C82 150 68 166 51 171Z" />
+            <path class="footer-bloom__leaf" d="M69 128 C44 121 39 103 43 88 C61 94 76 106 77 123Z" />
+            <path class="footer-bloom__leaf" d="M81 103 C82 81 99 68 115 70 C114 89 101 104 84 109Z" />
+            <path class="footer-bloom__leaf" d="M103 67 C82 59 77 42 82 28 C99 34 111 47 111 63Z" />
+            <path class="footer-bloom__leaf" d="M119 39 C121 19 136 8 149 10 C147 27 136 40 122 45Z" />
+            <path class="footer-bloom__vein" d="M10 158 Q25 173 38 187 M45 91 Q59 105 72 120 M84 31 Q98 45 108 61 M53 167 Q68 150 78 135 M86 106 Q101 89 111 75 M123 42 Q136 26 145 15" />
+          </svg>
+        </div>
+        <div class="footer-bloom footer-bloom--right" aria-hidden="true">
+          <svg viewBox="0 0 150 240" preserveAspectRatio="none">
+            <defs><linearGradient id="footer-leaf-gradient-right" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#315d3c"/><stop offset=".48" stop-color="#75a94d"/><stop offset=".78" stop-color="#a9cc73"/><stop offset="1" stop-color="#d5e6a0"/></linearGradient></defs>
+            <path class="footer-bloom__stem" d="M8 244 C35 203 30 166 60 130 C90 94 94 54 137 4" />
+            <path class="footer-bloom__leaf" d="M35 194 C9 187 6 168 8 155 C28 157 43 170 43 188 C41 191 38 193 35 194Z" />
+            <path class="footer-bloom__leaf" d="M48 165 C49 143 66 130 82 131 C82 150 68 166 51 171Z" />
+            <path class="footer-bloom__leaf" d="M69 128 C44 121 39 103 43 88 C61 94 76 106 77 123Z" />
+            <path class="footer-bloom__leaf" d="M81 103 C82 81 99 68 115 70 C114 89 101 104 84 109Z" />
+            <path class="footer-bloom__leaf" d="M103 67 C82 59 77 42 82 28 C99 34 111 47 111 63Z" />
+            <path class="footer-bloom__leaf" d="M119 39 C121 19 136 8 149 10 C147 27 136 40 122 45Z" />
+            <path class="footer-bloom__vein" d="M10 158 Q25 173 38 187 M45 91 Q59 105 72 120 M84 31 Q98 45 108 61 M53 167 Q68 150 78 135 M86 106 Q101 89 111 75 M123 42 Q136 26 145 15" />
+          </svg>
+        </div>
         <div class="footer-inner">
-          <div>
+          <div data-fly-in>
             <div class="footer-brand">
               <div class="brand-mark" aria-hidden="true"><img id="footerLogo" src="assets/aspen-leaf-logo.jpeg" alt="" /></div>
               <div>
@@ -1276,7 +1359,7 @@
             </p>
           </div>
 
-          <div class="footer-col">
+          <div class="footer-col" data-fly-in>
             <h4>About Us</h4>
             <a href="#mission">Mission</a>
             <a href="#services">Services</a>
@@ -1285,14 +1368,14 @@
             <a href="admin.html">Site admin</a>
           </div>
 
-          <div class="footer-col">
+          <div class="footer-col" data-fly-in>
             <h4>Stay Connected</h4>
             <div class="socials" aria-label="Social media links">
               <a id="footerFacebookIcon" href="https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/" aria-label="Aspen Leaf Scape on Facebook" target="_blank" rel="noopener noreferrer">f</a>
             </div>
           </div>
 
-          <div class="footer-col">
+          <div class="footer-col" data-fly-in>
             <h4>Contact</h4>
             <p id="footerWebsite">aspenleafscape.com</p>
             <a class="email" id="footerEmail" href="mailto:aspenleafscape@gmail.com">aspenleafscape@gmail.com</a>
@@ -1339,6 +1422,34 @@
       let serviceImagesLoaded = false;
       const serviceSlideIndexes = new Map();
       let heroSlideIndex = 0;
+      const flyInObserver = 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && entry.intersectionRatio >= 0.18) {
+                entry.target.classList.remove('fly-in-pending', 'fly-in-seen');
+                entry.target.classList.add('fly-in-active');
+              } else if (!entry.isIntersecting && entry.target.classList.contains('fly-in-active')) {
+                entry.target.classList.remove('fly-in-active');
+                entry.target.classList.add('fly-in-seen');
+              }
+            });
+          }, { threshold: [0, 0.18] })
+        : null;
+
+      function unobserveFlyIns(root) {
+        root.querySelectorAll('[data-fly-in]').forEach((element) => flyInObserver?.unobserve(element));
+      }
+
+      function observeFlyIns(root = document) {
+        if (!flyInObserver) return;
+        root.querySelectorAll('[data-fly-in]').forEach((element, index) => {
+          element.classList.add('fly-in-pending');
+          element.style.setProperty('--fly-in-delay', `${(index % 4) * 90}ms`);
+          flyInObserver.observe(element);
+        });
+      }
+
+      observeFlyIns();
 
       function escapeHtml(value = '') {
         return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -1432,6 +1543,7 @@
 
       function renderServiceCatalog() {
         serviceSlideIndexes.clear();
+        unobserveFlyIns(serviceCards);
         if (!serviceItems.length) {
           serviceCards.innerHTML = '<p>No services are currently listed. Contact us to discuss your project.</p>';
         } else {
@@ -1441,7 +1553,7 @@
             const image = images[0] || (service.image && !service.image.startsWith('assets/services/') ? service.image : siteData.afterImageUrl || '');
             const price = Number(service.price || 0);
             const message = `Hello Aspen Leaf Scape, I would like to book ${title}.`;
-            return `<article class="service-card">
+            return `<article class="service-card" data-fly-in>
               <div class="service-card__media" data-service-card="${index}">
                 <button class="service-card__open" type="button" data-service-open="${index}" aria-label="View before and after for ${escapeHtml(title)}">
                   <img class="service-card__image" data-service-slide src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">
@@ -1459,6 +1571,8 @@
             </article>`;
           }).join('');
         }
+
+        observeFlyIns(serviceCards);
 
         const serviceSelect = document.querySelector('#contactForm select[name="service"]');
         serviceSelect.replaceChildren(new Option('Select service', ''));
@@ -1648,7 +1762,7 @@
         const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
         const date = new Date(review.createdAt);
         const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
-        return `<article class="review-card">
+        return `<article class="review-card" data-fly-in>
           <div class="review-card__header">
             <h3 class="review-card__name">${escapeHtml(review.name || 'Customer')}</h3>
             <span class="review-card__stars" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>
@@ -1660,6 +1774,7 @@
 
       function renderReviews(reviews) {
         allReviews = Array.isArray(reviews) ? reviews : [];
+        unobserveFlyIns(reviewList);
         if (!reviews.length) {
           reviewList.innerHTML = '<p class="review-empty">No reviews yet. Be the first to share your experience.</p>';
           return;
@@ -1671,15 +1786,19 @@
           const moreButton = document.createElement('button');
           moreButton.type = 'button';
           moreButton.className = 'review-more';
+          moreButton.setAttribute('data-fly-in', '');
           moreButton.textContent = `View more reviews (${reviews.length - 3})`;
           moreButton.setAttribute('aria-haspopup', 'dialog');
           moreButton.addEventListener('click', () => {
             moreReviewsCount.textContent = `Showing ${reviews.length - 3} more of ${reviews.length} reviews.`;
+            unobserveFlyIns(moreReviewList);
             moreReviewList.innerHTML = reviews.slice(3).map(reviewCardHtml).join('');
+            observeFlyIns(moreReviewList);
             moreReviewsDialog.showModal();
           });
           reviewList.append(moreButton);
         }
+        observeFlyIns(reviewList);
       }
 
       document.getElementById('closeReviewsDialog').addEventListener('click', () => moreReviewsDialog.close());

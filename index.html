@@ -1176,7 +1176,7 @@
           <div class="footer-col">
             <h4>Contact</h4>
             <p id="footerWebsite">aspenleafscape.com</p>
-            <p class="email" id="footerEmail">hello@aspenleafscape.com</p>
+            <a class="email" id="footerEmail" href="mailto:aspenleafscape@gmail.com">aspenleafscape@gmail.com</a>
             <a id="footerWhatsapp" href="https://wa.me/254743313867" target="_blank" rel="noopener noreferrer">WhatsApp: +254 743 313867</a>
             <a id="footerFacebook" href="https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/" target="_blank" rel="noopener noreferrer">Facebook page</a>
           </div>
@@ -1393,7 +1393,11 @@
         document.getElementById('contactWhatsapp').href = whatsappHref;
         document.getElementById('contactWhatsapp').textContent = `WhatsApp ${whatsappLabel}`;
         document.getElementById('footerWebsite').textContent = contact.website || '';
-        document.getElementById('footerEmail').textContent = contact.email || '';
+        const contactEmail = contact.email && contact.email !== 'hello@aspenleafscape.com'
+            ? contact.email
+            : 'aspenleafscape@gmail.com';
+        document.getElementById('footerEmail').textContent = contactEmail;
+        document.getElementById('footerEmail').href = `mailto:${contactEmail}`;
         document.getElementById('footerWhatsapp').href = whatsappHref;
         document.getElementById('footerWhatsapp').textContent = `WhatsApp: ${whatsappLabel}`;
         document.getElementById('footerFacebook').href = contact.facebook || '#';

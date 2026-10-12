@@ -17,24 +17,34 @@ if (existsSync(path.join(root, '.env'))) {
     }
 }
 
-function hasCloudinaryConfig() {
-    const connectionUrl = process.env.CLOUDINARY_URL?.trim();
+function getCloudinaryConfig() {
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
     const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
     const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
-    return Boolean(connectionUrl || (cloudName && apiKey && apiSecret));
+    if (cloudName && apiKey && apiSecret) {
+        return { cloudName, apiKey, apiSecret };
+    }
+
+    const connectionUrl = process.env.CLOUDINARY_URL?.trim();
+    return connectionUrl ? { connectionUrl } : null;
 }
 
-// Configure Cloudinary using either CLOUDINARY_URL or separate API credentials.
-if (hasCloudinaryConfig()) {
-    if (process.env.CLOUDINARY_URL?.trim()) {
-        process.env.CLOUDINARY_URL = process.env.CLOUDINARY_URL.trim();
+function hasCloudinaryConfig() {
+    return Boolean(getCloudinaryConfig());
+}
+
+// Prefer the separate Render variables when all three are present. This avoids
+// an old/stale CLOUDINARY_URL overriding valid credentials added individually.
+const cloudinaryConfig = getCloudinaryConfig();
+if (cloudinaryConfig) {
+    if (cloudinaryConfig.connectionUrl) {
+        process.env.CLOUDINARY_URL = cloudinaryConfig.connectionUrl;
         cloudinary.config(true);
     } else {
         cloudinary.config({
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME.trim(),
-            api_key: process.env.CLOUDINARY_API_KEY.trim(),
-            api_secret: process.env.CLOUDINARY_API_SECRET.trim(),
+            cloud_name: cloudinaryConfig.cloudName,
+            api_key: cloudinaryConfig.apiKey,
+            api_secret: cloudinaryConfig.apiSecret,
             secure: true
         });
     }
@@ -288,8 +298,12 @@ const server = http.createServer(async (request, response) => {
             return sendJson(response, 200, { url: uploadResult.secure_url });
         } catch (error) {
             const message = error?.error?.message || error?.message || 'Unknown Cloudinary error.';
-            console.error('Cloudinary upload error:', message);
-            return sendJson(response, 502, { error: `Cloudinary upload failed: ${message}` });
+            const statusCode = Number(error?.http_code || error?.error?.http_code || 502);
+            console.error('Cloudinary upload error:', { statusCode, message });
+            const hint = statusCode === 401 || statusCode === 403
+                ? ' Check that CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET belong to the same Cloudinary account in Render.'
+                : '';
+            return sendJson(response, 502, { error: `Cloudinary upload failed (${statusCode}): ${message}.${hint}` });
         }
     }
 

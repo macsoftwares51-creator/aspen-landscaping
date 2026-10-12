@@ -49,6 +49,11 @@
         padding: 18px 0 0;
       }
 
+      main, .hero, .service-card, .story-card, .quote-section, .review-section,
+      .contact-wrap > *, .footer-inner > * { min-width: 0; }
+      .contact-item span, .footer-col a, .footer-col p,
+      .service-card__title, .service-card__description { overflow-wrap: anywhere; }
+
       .topbar {
         display: flex;
         align-items: center;
@@ -157,7 +162,7 @@
         isolation: isolate;
         overflow: hidden;
         display: grid;
-        grid-template-columns: 1.05fr 1.2fr;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.2fr);
         gap: 18px;
         align-items: center;
         padding: 18px 20px 6px;
@@ -168,21 +173,56 @@
         position: absolute;
         z-index: -1;
         inset: 0;
-        background-image: linear-gradient(90deg, rgba(239, 231, 220, 0.94) 0%, rgba(248, 245, 240, 0.78) 48%, rgba(239, 231, 220, 0.7) 100%), var(--hero-background-image);
+        background-image: linear-gradient(90deg, rgba(239, 231, 220, 0.94) 0%, rgba(248, 245, 240, 0.78) 48%, rgba(239, 231, 220, 0.7) 100%);
         background-size: cover;
         background-position: center;
         opacity: 0.72;
-        filter: saturate(0.78);
       }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background-image: var(--hero-background-image);
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        filter: saturate(0.78);
+        transition: opacity 1.1s ease;
+      }
+
+      .hero.has-hero-background::after { opacity: 0.72; }
 
       .hero-copy {
         padding: 12px 6px 0 12px;
       }
 
+      .hero.is-intro .hero-copy > .headline,
+      .hero.is-intro .hero-copy > .headline-rule,
+      .hero.is-intro .hero-copy > .subtext {
+        animation: hero-rise-in 760ms cubic-bezier(0.2, 0.72, 0.22, 1) both;
+      }
+
+      .hero.is-intro .hero-copy > .headline { animation-delay: 100ms; }
+      .hero.is-intro .hero-copy > .headline-rule { animation-delay: 420ms; }
+      .hero.is-intro .hero-copy > .subtext { animation-delay: 680ms; }
+      .hero.is-intro .hero-copy > .cta-row > :nth-child(1) { animation: hero-rise-in 760ms cubic-bezier(0.2, 0.72, 0.22, 1) 940ms both; }
+      .hero.is-intro .hero-copy > .cta-row > :nth-child(2) { animation: hero-rise-in 760ms cubic-bezier(0.2, 0.72, 0.22, 1) 1120ms both; }
+
+      .hero.is-intro .orb-wrap {
+        animation: hero-rise-in 900ms cubic-bezier(0.2, 0.72, 0.22, 1) 1180ms both;
+      }
+
+      @keyframes hero-rise-in {
+        from { opacity: 0; transform: translateY(58px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
       .headline {
         margin: 0;
         font-family: "Cormorant Garamond", serif;
-        font-size: clamp(4rem, 6vw, 7.2rem);
+        font-size: clamp(2.8rem, 6vw, 7.2rem);
         line-height: 0.8;
         letter-spacing: -0.07em;
         font-weight: 600;
@@ -290,6 +330,31 @@
         border: 2px solid rgba(31, 59, 45, 0.74);
         box-shadow: inset 0 0 0 6px rgba(216, 193, 168, 0.72), inset 0 0 0 10px rgba(31, 59, 45, 0.5);
         pointer-events: none;
+      }
+
+      .logo-orb::after {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        inset: 0.5%;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, transparent 0deg 220deg, #d8c18f 250deg, #a6cf7c 285deg, #315d3e 320deg, transparent 350deg);
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+        opacity: 0;
+        filter: drop-shadow(0 0 7px rgba(122, 167, 101, 0.75));
+        pointer-events: none;
+      }
+
+      .hero.is-intro .logo-orb::after {
+        animation: hero-orbit-settle var(--hero-intro-duration, 2.4s) cubic-bezier(0.08, 0.78, 0.16, 1) 1180ms both;
+      }
+
+      @keyframes hero-orbit-settle {
+        0% { opacity: 0; transform: rotate(-90deg) scale(0.94); }
+        7% { opacity: 1; }
+        78% { opacity: 1; }
+        100% { opacity: 0; transform: rotate(630deg) scale(1); }
       }
 
       .logo-orb img {
@@ -417,7 +482,7 @@
       .service-dialog {
         width: min(900px, calc(100% - 24px));
         max-width: 900px;
-        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
         padding: 0;
         overflow: auto;
         border: 1px solid rgba(31,59,45,0.18);
@@ -745,6 +810,14 @@
       .review-heading p { margin: 0; color: var(--muted); font-size: 0.9rem; }
       .review-layout { display: grid; grid-template-columns: minmax(280px, 0.85fr) 1.15fr; gap: 22px; align-items: start; }
       .review-list { display: grid; gap: 14px; min-width: 0; }
+      .review-more {
+        width: 100%; min-height: 46px; padding: 10px 16px; border: 1px solid var(--line);
+        border-radius: 10px; background: rgba(255,255,255,0.58); color: var(--forest);
+        font-weight: 700; cursor: pointer; text-align: center;
+      }
+      .review-more:hover { background: rgba(255,255,255,0.9); }
+      .review-dialog__list { display: grid; gap: 14px; }
+      .review-dialog__list .review-card { background: #fff; }
       .review-card { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.58); }
       .review-card__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .review-card__name { margin: 0; color: var(--forest); font-size: 0.95rem; }
@@ -878,7 +951,7 @@
         .nav.open { display: flex; }
         .menu-toggle { display: inline-flex; }
 
-        .headline { font-size: clamp(3.5rem, 18vw, 5.4rem); }
+        .headline { font-size: clamp(2.5rem, 14vw, 5.4rem); }
         .headline-rule { width: 120px; }
 
         .cta-row {
@@ -904,12 +977,44 @@
         .dialog-footer { align-items: stretch; flex-direction: column; }
 
         .hero-visual { min-height: 440px; }
-        .orb-wrap { width: min(88vw, 500px); }
+        .orb-wrap { width: min(78vw, 500px); }
         .footer { padding: 24px 20px 34px; }
       }
 
-      @media (min-width: 761px) {
+      @media (min-width: 761px) and (max-width: 980px) {
+        .topbar {
+          flex-wrap: wrap;
+          justify-content: center;
+          padding-top: 18px;
+        }
+
+        .nav {
+          display: none;
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 14px 22px;
+        }
+
+        .nav.open { display: flex; }
+        .menu-toggle { display: inline-flex; }
+      }
+
+      @media (min-width: 981px) {
         .menu-toggle { display: none; }
+      }
+
+      @media (max-width: 420px) {
+        .page { width: calc(100% - 20px); }
+        .topbar { gap: 10px; padding-right: 8px; padding-left: 8px; }
+        .brand { gap: 8px; }
+        .brand-name { font-size: clamp(1.65rem, 8vw, 2.2rem); }
+        .hero { padding-right: 14px; padding-left: 14px; }
+        .hero-copy { padding-left: 4px; padding-right: 4px; }
+        .hero-visual { min-height: auto; padding: 16px 0; }
+        .quote-section { padding: 20px 16px; border-radius: 20px; }
+        .contact-card, .form-card { padding: 22px 18px; }
+        .footer { padding-right: 16px; padding-left: 16px; }
       }
     </style>
   </head>
@@ -1096,6 +1201,20 @@
             </div>
           </div>
         </section>
+
+        <dialog class="service-dialog" id="moreReviewsDialog" aria-labelledby="moreReviewsHeading">
+          <div class="dialog-content">
+            <div class="dialog-heading">
+              <div>
+                <div class="dialog-eyebrow">Customer feedback</div>
+                <h2 id="moreReviewsHeading">More Reviews</h2>
+                <p id="moreReviewsCount"></p>
+              </div>
+              <button class="dialog-close" type="button" id="closeReviewsDialog" aria-label="Close reviews">&times;</button>
+            </div>
+            <div class="review-dialog__list" id="moreReviewList"></div>
+          </div>
+        </dialog>
 
         <section class="contact-wrap" id="contact">
           <div class="contact-card">
@@ -1377,7 +1496,8 @@
         document.getElementById('footerBrandName').textContent = brandName;
         document.getElementById('headerBrandSubtitle').textContent = brandSubtitle;
         document.getElementById('footerBrandSubtitle').textContent = brandSubtitle;
-        document.getElementById('heroHeadline').textContent = siteData.heroHeadline || 'Transform Your Outdoor Elegantly';
+        const heroHeadline = siteData.heroHeadline || 'Transform Your Outdoor Elegantly';
+        document.getElementById('heroHeadline').textContent = heroHeadline;
         document.getElementById('heroSubtitle').textContent = siteData.heroSubtitle || '';
         const logoUrl = siteData.logoUrl || 'assets/aspen-leaf-logo.jpeg';
         const heroLogoUrl = siteData.heroLogoUrl || 'assets/aspen-leaf-logo-hero.png';
@@ -1402,17 +1522,54 @@
         document.getElementById('footerWhatsapp').textContent = `WhatsApp: ${whatsappLabel}`;
         document.getElementById('footerFacebook').href = contact.facebook || '#';
         document.getElementById('footerFacebookIcon').href = contact.facebook || '#';
+        startHeroIntro(heroHeadline);
+      }
+
+      let heroIntroStarted = false;
+      function startHeroIntro(headline) {
+        if (heroIntroStarted) return;
+        heroIntroStarted = true;
+        const hero = document.querySelector('.hero');
+        const heading = document.getElementById('heroHeadline');
+        const fullText = String(headline || '');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          heading.textContent = fullText;
+          hero.classList.add('has-hero-background');
+          return;
+        }
+
+        const duration = Math.max(2000, Math.min(4200, fullText.length * 48));
+        const interval = duration / Math.max(fullText.length, 1);
+        hero.style.setProperty('--hero-intro-duration', `${duration}ms`);
+        heading.setAttribute('aria-label', fullText);
+        heading.setAttribute('aria-busy', 'true');
+        heading.textContent = '';
+        hero.classList.add('is-intro');
+
+        let character = 0;
+        const typingTimer = window.setInterval(() => {
+          character += 1;
+          heading.textContent = fullText.slice(0, character);
+          if (character >= fullText.length) {
+            window.clearInterval(typingTimer);
+            heading.removeAttribute('aria-busy');
+          }
+        }, interval);
+        window.setTimeout(() => {
+          hero.classList.remove('is-intro');
+          hero.classList.add('has-hero-background');
+        }, duration + 1400);
       }
 
       async function loadServiceImages() {
         try {
           let result;
           try {
-            const response = await fetch(new URL('api/service-images', siteBaseUrl));
+            const response = await fetch(new URL('api/service-images', siteBaseUrl), { cache: 'no-store' });
             if (!response.ok) throw new Error('Service image API is unavailable.');
             result = await response.json();
           } catch (error) {
-            const response = await fetch(new URL('pictures/service-images.json', siteBaseUrl));
+            const response = await fetch(new URL('pictures/service-images.json', siteBaseUrl), { cache: 'no-store' });
             if (!response.ok) throw new Error('Could not load service photo manifest.');
             result = await response.json();
           }
@@ -1481,28 +1638,51 @@
       const reviewList = document.getElementById('reviewList');
       const reviewStatus = document.getElementById('reviewStatus');
       const reviewSubmit = document.getElementById('reviewSubmit');
+      const moreReviewsDialog = document.getElementById('moreReviewsDialog');
+      const moreReviewList = document.getElementById('moreReviewList');
+      const moreReviewsCount = document.getElementById('moreReviewsCount');
+      let allReviews = [];
       let reviewApiAvailable = false;
 
+      function reviewCardHtml(review) {
+        const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
+        const date = new Date(review.createdAt);
+        const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
+        return `<article class="review-card">
+          <div class="review-card__header">
+            <h3 class="review-card__name">${escapeHtml(review.name || 'Customer')}</h3>
+            <span class="review-card__stars" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>
+          </div>
+          <p class="review-card__message">${escapeHtml(review.message || '')}</p>
+          ${dateLabel ? `<p class="review-card__date">${dateLabel}</p>` : ''}
+        </article>`;
+      }
+
       function renderReviews(reviews) {
+        allReviews = Array.isArray(reviews) ? reviews : [];
         if (!reviews.length) {
           reviewList.innerHTML = '<p class="review-empty">No reviews yet. Be the first to share your experience.</p>';
           return;
         }
 
-        reviewList.innerHTML = reviews.map((review) => {
-          const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
-          const date = new Date(review.createdAt);
-          const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
-          return `<article class="review-card">
-            <div class="review-card__header">
-              <h3 class="review-card__name">${escapeHtml(review.name || 'Customer')}</h3>
-              <span class="review-card__stars" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>
-            </div>
-            <p class="review-card__message">${escapeHtml(review.message || '')}</p>
-            ${dateLabel ? `<p class="review-card__date">${dateLabel}</p>` : ''}
-          </article>`;
-        }).join('');
+        const visibleReviews = reviews.slice(0, 3);
+        reviewList.innerHTML = visibleReviews.map(reviewCardHtml).join('');
+        if (reviews.length > 3) {
+          const moreButton = document.createElement('button');
+          moreButton.type = 'button';
+          moreButton.className = 'review-more';
+          moreButton.textContent = `View more reviews (${reviews.length - 3})`;
+          moreButton.setAttribute('aria-haspopup', 'dialog');
+          moreButton.addEventListener('click', () => {
+            moreReviewsCount.textContent = `Showing ${reviews.length - 3} more of ${reviews.length} reviews.`;
+            moreReviewList.innerHTML = reviews.slice(3).map(reviewCardHtml).join('');
+            moreReviewsDialog.showModal();
+          });
+          reviewList.append(moreButton);
+        }
       }
+
+      document.getElementById('closeReviewsDialog').addEventListener('click', () => moreReviewsDialog.close());
 
       async function loadReviews() {
         try {
@@ -1552,6 +1732,9 @@
         }
       });
 
+      // Review form entries are temporary page data; discard them when the page is exited.
+      window.addEventListener('pagehide', () => reviewForm.reset());
+
       loadReviews();
 
       const menuToggle = document.querySelector('.menu-toggle');
@@ -1581,6 +1764,47 @@
         comparisonAfterLabel.style.width = `${Math.max(0, stageWidth * afterPercent / 100 - 24)}px`;
       }
 
+      let comparisonHintFrame = 0;
+      function stopComparisonHint() {
+        if (comparisonHintFrame) cancelAnimationFrame(comparisonHintFrame);
+        comparisonHintFrame = 0;
+      }
+
+      function playComparisonHint() {
+        stopComparisonHint();
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const path = [50, 82, 18, 50];
+        const legDuration = 520;
+        let leg = 0;
+        let legStartedAt = null;
+
+        function animateHint(timestamp) {
+          if (legStartedAt === null) legStartedAt = timestamp;
+          const progress = Math.min((timestamp - legStartedAt) / legDuration, 1);
+          const eased = progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+          const value = path[leg] + (path[leg + 1] - path[leg]) * eased;
+          comparisonRange.value = String(value);
+          updateComparison();
+
+          if (progress >= 1) {
+            leg += 1;
+            legStartedAt = null;
+            if (leg >= path.length - 1) {
+              comparisonRange.value = '50';
+              updateComparison();
+              comparisonHintFrame = 0;
+              return;
+            }
+          }
+          comparisonHintFrame = requestAnimationFrame(animateHint);
+        }
+
+        comparisonHintFrame = requestAnimationFrame(animateHint);
+      }
+
       serviceCards.addEventListener('click', (event) => {
         const slideControl = event.target.closest('[data-service-slide-change]');
         if (slideControl) {
@@ -1607,14 +1831,24 @@
         comparisonRange.value = '50';
         updateComparison();
         serviceDialog.showModal();
+        playComparisonHint();
       });
 
       comparisonRange.addEventListener('input', updateComparison);
+      comparisonRange.addEventListener('pointerdown', stopComparisonHint);
+      comparisonRange.addEventListener('keydown', stopComparisonHint);
       window.addEventListener('resize', updateComparison);
-      document.getElementById('closeServiceDialog').addEventListener('click', () => serviceDialog.close());
-      serviceDialog.addEventListener('click', (event) => {
-        if (event.target === serviceDialog) serviceDialog.close();
+      document.getElementById('closeServiceDialog').addEventListener('click', () => {
+        stopComparisonHint();
+        serviceDialog.close();
       });
+      serviceDialog.addEventListener('click', (event) => {
+        if (event.target === serviceDialog) {
+          stopComparisonHint();
+          serviceDialog.close();
+        }
+      });
+      serviceDialog.addEventListener('close', stopComparisonHint);
 
       document.getElementById('contactForm').addEventListener('submit', (event) => {
         event.preventDefault();

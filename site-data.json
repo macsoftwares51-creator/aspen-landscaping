@@ -1,0 +1,60 @@
+{
+  "heroHeadline": "Transforming Lawns into Living Masterpieces",
+  "heroSubtitle": "Full-service landscaping, automated care schedules, and custom hardscaping.",
+  "mowingPrice": "45",
+  "hardscapePrice": "1200",
+  "designPrice": "350",
+  "estimatorBaseRate": 120,
+  "estimatorPer1000": 8,
+  "catalogVersion": 1,
+  "heroBgUrl": "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80",
+  "beforeImageUrl": "https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80",
+  "afterImageUrl": "https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80",
+  "serviceItems": [
+    {
+      "id": "arabic-grass",
+      "title": "Arabic Grass Installation",
+      "description": "Fresh, even lawns with quality grass supply and careful installation.",
+      "price": 0,
+      "image": "",
+      "beforeImage": "",
+      "afterImage": ""
+    },
+    {
+      "id": "kabro-installation",
+      "title": "Kabro Installation",
+      "description": "Durable patterned paving for driveways, walkways, and outdoor areas.",
+      "price": 0,
+      "image": "",
+      "beforeImage": "",
+      "afterImage": ""
+    },
+    {
+      "id": "garden-maintenance",
+      "title": "Garden Maintenance",
+      "description": "Reliable pruning, lawn care, weeding, and seasonal garden upkeep.",
+      "price": 0,
+      "image": "",
+      "beforeImage": "",
+      "afterImage": ""
+    },
+    {
+      "id": "mazeras-installation",
+      "title": "Mazeras Installation",
+      "description": "Natural stone finishes for paths, patios, steps, and garden features.",
+      "price": 0,
+      "image": "",
+      "beforeImage": "",
+      "afterImage": ""
+    },
+    {
+      "id": "landscape-design",
+      "title": "Landscape Design",
+      "description": "A considered plan for planting, paving, lawns, and outdoor living.",
+      "price": 0,
+      "image": "",
+      "beforeImage": "",
+      "afterImage": ""
+    }
+  ]
+}

@@ -18,6 +18,7 @@
   "logoUrl": "assets/aspen-leaf-logo.jpeg",
   "heroLogoUrl": "assets/aspen-leaf-logo-hero.png",
   "heroBgUrl": "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80",
+  "heroImages": [],
   "beforeImageUrl": "https://images.unsplash.com/photo-1533460003986-cf805931148f?auto=format&fit=crop&w=1200&q=80",
   "afterImageUrl": "https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=1200&q=80",
   "serviceItems": [
@@ -74,12 +75,12 @@
   ],
   "contact": {
     "heading": "Make your outdoor space feel like home.",
-    "location": "Riverside, Nairobi • Serving homes and businesses across the city",
+    "location": "00100 Nairobi Kenya ruaka",
     "hours": "Mon–Sat | 8:00 AM – 6:00 PM",
     "phone": "+254 743 313867",
     "whatsapp": "254743313867",
     "email": "hello@aspenleafscape.com",
-    "website": "aspenleafscape.com",
+    "website": "https://aspen-landscaping.onrender.com/",
     "facebook": "https://www.facebook.com/p/Aspen-leaf-scape-ltd-61582398656244/"
   }
 }

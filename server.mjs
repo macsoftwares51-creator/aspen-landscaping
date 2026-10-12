@@ -228,6 +228,46 @@ const server = http.createServer(async (request, response) => {
         }
     }
 
+    if (requestUrl.pathname === '/api/admin/settings' && request.method === 'POST') {
+        if (!isAdminAuthenticated(request)) return sendJson(response, 401, { error: 'Authentication required.' });
+        if (!hasGitHubConfig()) return sendJson(response, 503, { error: 'GitHub config missing on server.' });
+        try {
+            const body = await readRequestBody(request);
+            
+            // Re-using your GitHub publishing logic here:
+            const settingsPath = 'site-data.json';
+            const owner = encodeURIComponent(process.env.GITHUB_OWNER);
+            const repo = encodeURIComponent(process.env.GITHUB_REPO);
+            const endpoint = `${githubApi}/repos/${owner}/${repo}/contents/${settingsPath}`;
+            
+            // Check if file already exists to get its SHA
+            const existing = await fetch(endpoint, { headers: githubHeaders() });
+            let sha = null;
+            if (existing.ok) {
+                const fileData = await existing.json();
+                sha = fileData.sha;
+            }
+
+            const content = Buffer.from(JSON.stringify(body, null, 2)).toString('base64');
+            const responsePayload = await fetch(endpoint, {
+                method: 'PUT',
+                headers: { ...githubHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: 'Admin Update: Site Settings',
+                    content,
+                    ...(sha ? { sha } : {})
+                })
+            });
+
+            if (!responsePayload.ok) throw new Error(`GitHub write failed (${responsePayload.status}).`);
+
+            return sendJson(response, 200, { ok: true });
+        } catch (error) {
+            console.error(error);
+            return sendJson(response, 502, { error: 'Could not publish to GitHub.' });
+        }
+    }
+    
     if (requestUrl.pathname === '/api/service-images' && request.method === 'GET') {
         try {
             const pictureRoot = path.join(root, 'pictures');
